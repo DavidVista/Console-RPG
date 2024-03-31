@@ -1,0 +1,11 @@
+Narrator: Once upon a time 
+A new fighter came to town, Arthur.
+Arthur just obtained a new weapon called Excalibur.
+Error caught
+A new archer came to town, Robin.
+A new fighter came to town, Harry.
+Arthur:fighter:200 Harry:fighter:100 Robin:archer:150 
+Arthur:fighter:200 Harry:fighter:100 Robin:archer:150 
+Excalibur:0 
+
+Error caught
