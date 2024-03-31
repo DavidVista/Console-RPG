@@ -1,11 +1,12 @@
 Narrator: Once upon a time 
 A new fighter came to town, Arthur.
-Arthur just obtained a new weapon called Excalibur.
+Arthur just obtained a new potion called elixir1.
+Arthur just obtained a new potion called elixir2.
+Arthur just obtained a new potion called elixir3.
+Arthur just obtained a new potion called elixir4.
+Arthur just obtained a new potion called elixir5.
 Error caught
-A new archer came to town, Robin.
-A new fighter came to town, Harry.
-Arthur:fighter:200 Harry:fighter:100 Robin:archer:150 
-Arthur:fighter:200 Harry:fighter:100 Robin:archer:150 
-Excalibur:0 
-
-Error caught
+Arthur: Time for some elixir 
+Arthur drinks elixir1 from Arthur.
+Arthur:fighter:250 
+elixir2:100 elixir3:150 elixir4:250 elixir5:350 

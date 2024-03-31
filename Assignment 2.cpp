@@ -197,7 +197,6 @@ private:
 protected:
 	virtual void obtainItem(std::shared_ptr<PhysicalItem> item) = 0;
 	virtual void loseItem(const std::shared_ptr<PhysicalItem> item) = 0;
-	virtual void setup() const = 0;
 public:
 	friend class PhysicalItem;
 	friend class Game;
@@ -231,9 +230,9 @@ private:
 	Game();
 public:
 
-	~Game();
-
 	void startNewGame();
+
+	void finishGame();
 
 	static std::shared_ptr<Game> currentGame();
 
@@ -288,10 +287,10 @@ std::shared_ptr<T> Container<T>::get(const std::string& itemName) const {
 
 template<DerivedFromPhysicalItem T>
 std::vector<std::shared_ptr<T>> Container<T>::getElements() const {
-	std::vector<std::shared_ptr<T>> result(map.size());
+	std::vector<std::shared_ptr<T>> result;
 	int i = 0;
 	for (auto it = map.begin(); it != map.end(); ++it) {
-		result[i] = it->second;
+		result.push_back(it->second);
 	}
 	return result;
 }
@@ -341,10 +340,7 @@ void Character::heal(int healValue) {
 
 Character::Character(const std::string nameString, int healthValue) : name(nameString), healthPoints(healthValue) {}
 
-Character::~Character() {
-	auto game = Game::currentGame();
-	sysout << name << " has died...\n";
-};
+Character::~Character() = default;
 
 std::string	Character::getName() const {
 	return name;
@@ -385,7 +381,6 @@ protected:
 		}
 	}
 
-	virtual void setup() const = 0;
 	virtual void useLogic(const std::shared_ptr<const Character> user, std::shared_ptr<Character> target) const = 0;
 
 	void afterUse() {
@@ -430,19 +425,11 @@ private:
 	void useLogic(const std::shared_ptr<const Character> user, std::shared_ptr<Character> target) const override {
 		giveDamageTo(target, getDamage());
 	}
-
-	void setup() const override {
-		auto game = Game::currentGame();
-		sysout << owner->getName() << " just obtained a new weapon called " << getName() << ".\n";
-	}
 public:
-
-	Weapon(const std::shared_ptr<Character> owner, const std::string name, int damage) : PhysicalItem(false, owner, name) {
+	Weapon(const std::shared_ptr<Character> owner, const std::string name, int damage) : PhysicalItem(false, owner, name), damage(damage) {
 		if (damage <= 0) {
 			throw IllegalDamageValue();
 		}
-
-		setup();
 	}
 
 	~Weapon() = default;
@@ -465,19 +452,11 @@ private:
 	void useLogic(const std::shared_ptr<const Character> user, std::shared_ptr<Character> target) const override {
 		giveHealTo(target, getHealValue());
 	}
-
-	void setup() const override {
-		auto game = Game::currentGame();
-		sysout << owner->getName() << " just obtained a new potion called " << getName() << ".\n";
-	}
 public:
-	
-	Potion(const std::shared_ptr<Character> owner, const std::string name, int healValue) : PhysicalItem(true, owner, name) {
+	Potion(const std::shared_ptr<Character> owner, const std::string name, int healValue) : PhysicalItem(true, owner, name), healValue(healValue) {
 		if (healValue <= 0) {
 			throw IllegalHealthValue();
 		}
-
-		setup();
 	}
 
 	~Potion() = default;
@@ -506,16 +485,9 @@ private:
 
 		throw NotAllowedTarget();
 	}
-
-	void setup() const override {
-		auto game = Game::currentGame();
-		sysout << owner->getName() << " just obtained a new spell called " << getName() << ".\n";
-	}
 public:
 	
-	Spell(const std::shared_ptr<Character> owner, const std::string name, const std::vector<std::shared_ptr<Character>>& allowedTargets) : PhysicalItem(true, owner, name), allowedTargets(allowedTargets) {
-		setup();
-	}
+	Spell(const std::shared_ptr<Character> owner, const std::string name, const std::vector<std::shared_ptr<Character>>& allowedTargets) : PhysicalItem(true, owner, name), allowedTargets(allowedTargets) {}
 
 	~Spell() = default;
 
@@ -631,16 +603,8 @@ protected:
 		
 		item.reset();
 	}
-
-	void setup() const override {
-		auto game = Game::currentGame();
-		sysout << "A new fighter came to town, " << getName() << ".\n";
-	}
 public:
-
-	Fighter(const std::string nameString, int healthValue) : Character(nameString, healthValue), WeaponUser(nameString, healthValue, maxAllowedWeapons), PotionUser(nameString, healthValue, maxAllowedPotions) {
-		setup();
-	}
+	Fighter(const std::string nameString, int healthValue) : Character(nameString, healthValue), WeaponUser(nameString, healthValue, maxAllowedWeapons), PotionUser(nameString, healthValue, maxAllowedPotions) {}
 
 	~Fighter() = default;
 
@@ -685,15 +649,8 @@ protected:
 
 		item.reset();
 	}
-
-	void setup() const override {
-		auto game = Game::currentGame();
-		sysout << "A new archer came to town, " << getName() << ".\n";
-	}
 public:
-	Archer(const std::string nameString, int healthValue) : Character(nameString, healthValue), WeaponUser(nameString, healthValue, maxAllowedWeapons), PotionUser(nameString, healthValue, maxAllowedPotions), SpellUser(nameString, healthValue, maxAllowedSpells) {
-		setup();
-	}
+	Archer(const std::string nameString, int healthValue) : Character(nameString, healthValue), WeaponUser(nameString, healthValue, maxAllowedWeapons), PotionUser(nameString, healthValue, maxAllowedPotions), SpellUser(nameString, healthValue, maxAllowedSpells) {}
 
 	~Archer() = default;
 
@@ -732,15 +689,8 @@ protected:
 
 		item.reset();
 	}
-
-	void setup() const override {
-		auto game = Game::currentGame();
-		sysout << "A new wizard came to town, " << getName() << ".\n";
-	}
 public:
-	Wizard(const std::string nameString, int healthValue) : Character(nameString, healthValue), PotionUser(nameString, healthValue, maxAllowedPotions), SpellUser(nameString, healthValue, maxAllowedSpells) {
-		setup();
-	}
+	Wizard(const std::string nameString, int healthValue) : Character(nameString, healthValue), PotionUser(nameString, healthValue, maxAllowedPotions), SpellUser(nameString, healthValue, maxAllowedSpells) {}
 
 	~Wizard() = default;
 
@@ -782,12 +732,7 @@ void Game::showCharacters() {
 
 Game::Game() {
 	input.open("input.txt", std::ios_base::in);
-	output.open("output.txt", std::ios_base::out);
-}
-
-Game::~Game() {
-	input.close();
-	output.close();
+	output.open("output.txt");
 }
 
 void Game::startNewGame() {
@@ -807,12 +752,15 @@ void Game::startNewGame() {
 
 				if (type == "fighter") {
 					newChararcter = std::make_shared<Fighter>(name, initHP);
+					output << "A new fighter came to town, " << name << ".\n";
 				}
 				else if (type == "archer") {
 					newChararcter = std::make_shared<Archer>(name, initHP);
+					output << "A new archer came to town, " << name << ".\n";
 				}
 				else if (type == "wizard") {
-					newChararcter = std::make_shared<Fighter>(name, initHP);
+					newChararcter = std::make_shared<Wizard>(name, initHP);
+					output << "A new wizard came to town, " << name << ".\n";
 				}
 				else {
 					throw std::runtime_error("Unexpected command");
@@ -832,6 +780,7 @@ void Game::startNewGame() {
 
 						std::shared_ptr<Weapon> newWeapon(new Weapon(owner, weaponName, damageValue));
 						owner->obtainItem(newWeapon);
+						output << ownerName << " just obtained a new weapon called " << weaponName << ".\n";
 					}
 					catch (const CharacterDoesNotExist&) {
 						output << "Error caught\n";
@@ -859,6 +808,7 @@ void Game::startNewGame() {
 
 						std::shared_ptr<Potion> newPotion(new Potion(owner, potionName, healValue));
 						owner->obtainItem(newPotion);
+						output << ownerName << " just obtained a new potion called " << potionName << ".\n";
 					}
 					catch (const CharacterDoesNotExist&) {
 						output << "Error caught\n";
@@ -895,12 +845,9 @@ void Game::startNewGame() {
 
 						std::shared_ptr<Spell> newSpell(new Spell(owner, spellName, allowedTargets));
 						owner->obtainItem(newSpell);
+						output << ownerName << " just obtained a new spell called " << spellName << ".\n";
 					}
 					catch (const CharacterDoesNotExist&) {
-						output << "Error caught\n";
-						continue;
-					}
-					catch (const IllegalHealthValue&) {
 						output << "Error caught\n";
 						continue;
 					}
@@ -933,6 +880,7 @@ void Game::startNewGame() {
 				if (dynamic_cast<WeaponUser*>(attacker.get())) {
 					auto weaponUser = std::dynamic_pointer_cast<WeaponUser>(attacker);
 					weaponUser->attack(target, weaponName);
+					output << attackerName << " attacks " << targetName << " with their " << weaponName << "!\n";
 				}
 				else {
 					throw IllegalItemType();
@@ -964,6 +912,7 @@ void Game::startNewGame() {
 				if (dynamic_cast<SpellUser*>(caster.get())) {
 					auto spellUser = std::dynamic_pointer_cast<SpellUser>(caster);
 					spellUser->cast(target, spellName);
+					output << casterName << " casts " << spellName << " on " << targetName << "!\n";
 				}
 				else {
 					throw IllegalItemType();
@@ -998,6 +947,7 @@ void Game::startNewGame() {
 
 				auto potionUser = std::dynamic_pointer_cast<PotionUser>(supplier);
 				potionUser->drink(drinker, potionName);
+				output << drinkerName << " drinks " << potionName << " from " << supplierName << ".\n";
 			}
 			catch (const CharacterDoesNotExist&) {
 				output << "Error caught\n";
@@ -1101,6 +1051,14 @@ void Game::startNewGame() {
 	}
 }
 
+void Game::finishGame() {
+	
+	characters.~Container();
+
+	input.close();
+	output.close();
+}
+
 std::shared_ptr<Game> Game::currentGame() {
 	if (game == nullptr) {
 		game.reset(new Game());
@@ -1110,6 +1068,7 @@ std::shared_ptr<Game> Game::currentGame() {
 
 void Game::destroyCharacter(std::shared_ptr<Character> ptr) {
 	characters.removeItem(ptr);
+	output << ptr->getName() << " has died...\n";
 	ptr.reset();
 }
 
@@ -1130,5 +1089,6 @@ inline int Wizard::maxAllowedSpells{ 10 };
 int main() {
 	auto game = Game::currentGame();
 	game->startNewGame();
+	game->finishGame();
 	return 0;
 }
