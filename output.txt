@@ -1,12 +1,3 @@
-Narrator: Once upon a time 
-A new fighter came to town, Arthur.
-Arthur just obtained a new potion called elixir1.
-Arthur just obtained a new potion called elixir2.
-Arthur just obtained a new potion called elixir3.
-Arthur just obtained a new potion called elixir4.
-Arthur just obtained a new potion called elixir5.
+A new wizard came to town, Mage.
 Error caught
-Arthur: Time for some elixir 
-Arthur drinks elixir1 from Arthur.
-Arthur:fighter:250 
-elixir2:100 elixir3:150 elixir4:250 elixir5:350 
+Narrator: Hello World 

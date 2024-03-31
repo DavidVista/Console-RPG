@@ -1,13 +1,4 @@
-12
-Dialogue Narrator 4 Once upon a time
-Create character fighter Arthur 200
-Create item potion Arthur elixir1 50
-Create item potion Arthur elixir2 100
-Create item potion Arthur elixir3 150
-Create item potion Arthur elixir4 250
-Create item potion Arthur elixir5 350
-Create item potion Arthur elixir6 450
-Dialogue Arthur 4 Time for some elixir
-Drink Arthur Arthur elixir1
-Show characters
-Show potions Arthur
+3
+Create character wizard Mage 100
+Create item spell Mage s1 2 John Mage
+Dialogue Narrator 2 Hello World
