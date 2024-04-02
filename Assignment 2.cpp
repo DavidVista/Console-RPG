@@ -5,9 +5,6 @@
 #include <fstream>
 #include <memory>
 
-#include <chrono>
-#include <thread>
-
 // Output stream
 
 #define sysout game->getOutput()
@@ -70,7 +67,7 @@ public:
 	}
 };
 
-// Forward declarations of General Classes
+// Forward Declarations of Classes
 
 class Character;
 class PhysicalItem;
@@ -87,40 +84,69 @@ class Game;
 
 // Concepts
 
+/// <summary>
+/// Concept to accept classes, derived from PhysicalItem.
+/// </summary>
 template<typename T>
 concept DerivedFromPhysicalItem = std::derived_from<T, PhysicalItem>;
 
+/// <summary>
+/// Concept to accept classes, which implement print procedure.
+/// </summary>
 template<typename T>
 concept Printable =
 	requires (std::ostream & os, T x) { x.print(os); };
 
+/// <summary>
+/// Concept to accept classes, supporting comparing instances.
+/// </summary>
 template<typename T>
 concept Comparable =
 	requires (T x, T y) { x > y; x < y; };
 
+/// <summary>
+/// Concept to accept classes, both implementing printing and supporting comparing.
+/// </summary>
 template<typename T>
 concept ComparableAndPritable = Printable<T> && Comparable<T>;
 
 // Classes
 
+/// <summary>
+/// Template class to represent dynamic container of elements.
+/// </summary>
+/// <typeparam name="T"> template parameter </typeparam>
 template<typename T>
 class Container {
 private:
 	std::vector<std::shared_ptr<T>> elements;
 public:
 
+	// Constructor
 	Container() : elements() {}
 
+	// Destructor
 	virtual ~Container() {
+
+		// Destroying elements in container
 		for (auto& itemPtr : elements) {
 			itemPtr.reset();
 		}
 	}
 
+	/// <summary>
+	/// Getter for size.
+	/// </summary>
+	/// <returns>size of the container</returns>
 	int size() const {
 		return elements.size();
 	}
 
+	/// <summary>
+	/// Function to determine existence of an element in the container.
+	/// </summary>
+	/// <param name="item"> pointer to the item stored in the container </param>
+	/// <returns> true if item is present else false </returns>
 	bool find(const std::shared_ptr<const T> item) const {
 		for (auto& element : elements) {
 			if (element == item) {
@@ -131,6 +157,10 @@ public:
 		return false;
 	}
 
+	/// <summary>
+	/// Removes the item from the container.
+	/// </summary>
+	/// <param name="newItem"> pointer to the item stored in the container </param>
 	void removeItem(const std::shared_ptr<const T> newItem) {
 		for (int i = 0; i < elements.size(); ++i) {
 			if (elements[i] == newItem) {
@@ -142,103 +172,251 @@ public:
 		throw ElementNotFound();
 	}
 
+	/// <summary>
+	/// Inserts an element into the container.
+	/// </summary>
+	/// <param name="newItem"> pointer to the item </param>
 	virtual void addItem(std::shared_ptr<T> newItem) {
 		elements.push_back(newItem);
 	}
 
+	/// <summary>
+	/// Getter for the vector of elements.
+	/// </summary>
+	/// <returns> vector of the elements stored in the container </returns>
 	std::vector<std::shared_ptr<T>> getElements() const {
 		return elements;
 	}
 };
 
+/// <summary>
+/// Template specialization of the template class container
+/// to represent dynamic container of elements, derived from PhysicalItem.
+/// </summary>
+/// <typeparam name="T"> template parameter requiring concept DerivedFromPhysicalItem </typeparam>
 template<DerivedFromPhysicalItem T>
 class Container<T> {
 private:
+	// Map to store pair with key of item name and value of pointer to item instance
 	std::unordered_map<std::string, std::shared_ptr<T>> map;
 public:
 
+	// Constructor
 	Container();
 
+	// Destructor
 	virtual ~Container();
 
+	/// <summary>
+	/// Getter for size.
+	/// </summary>
+	/// <returns> size of the container </returns>
 	int size() const;
 
+	/// <summary>
+	/// Inserts an element into the container.
+	/// </summary>
+	/// <param name="newItem"> pointer to the item instance </param>
 	virtual void addItem(std::shared_ptr<T> newItem);
 
+	/// <summary>
+	/// Removes the item from the container by the name.
+	/// </summary>
+	/// <param name="itemName"> name of the item </param>
 	void removeItem(const std::string& itemName);
 
+	/// <summary>
+	/// Function to determine existence of an element in the container
+	/// by the name.
+	/// </summary>
+	/// <param name="itemName"> name of the item</param>
+	/// <returns> true if present in the container else false</returns>
 	bool find(const std::string& itemName) const;
 
+	/// <summary>
+	/// Gets the item from the container by the name.
+	/// </summary>
+	/// <param name="itemName"> name of the item </param>
+	/// <returns> the pointer to the item instance </returns>
 	std::shared_ptr<T> get(const std::string& itemName) const;
 
+	/// <summary>
+	/// Getter for the vector of elements.
+	/// </summary>
+	/// <returns> the vector of pointers to the items stored in the container </returns>
 	std::vector<std::shared_ptr<T>> getElements() const;
 
 };
 
+/// <summary>
+/// Template class inherits from Container class and represents a dynamic container of elements
+/// with limited capacity.
+/// </summary>
+/// <typeparam name="T"> template parameter requiring concept ComparableAndPritable</typeparam>
 template<ComparableAndPritable T>
 class ContainerWithMaxCapacity : public Container<T> {
 private:
 	int maxCapacity;
 public:
+
+	// Constructor
 	ContainerWithMaxCapacity(int maxCapacity);
 
+	// Destructor
 	~ContainerWithMaxCapacity();
 
+	/// <summary>
+	/// Overriden method to insert item with the check for available space.
+	/// </summary>
+	/// <param name="newItem"> pointer to the item </param>
 	void addItem(std::shared_ptr<T> newItem) override;
 
+	/// <summary>
+	/// Displays elements in the container.
+	/// </summary>
 	void show() const;
 };
 
+/// <summary>
+/// * Abstract class Character represents a player
+/// in the story.
+/// 
+/// The class enables creating shared pointers to an instance.
+/// </summary>
 class Character : public std::enable_shared_from_this<Character> {
 private:
+	// Name of a character
 	std::string name;
+
+	// Health points of a character
 	int healthPoints;
 
+	/// <summary>
+	/// Manages taking damage to a character.
+	/// </summary>
+	/// <param name="damage"> damage value </param>
 	void takeDamage(int damage);
 
+	/// <summary>
+	/// Manages healing a character.
+	/// </summary>
+	/// <param name="healValue">heal value</param>
 	void heal(int healValue);
 protected:
+	
+	/// <summary>
+	/// Abstract function that manages obtaining an item by a character.
+	/// </summary>
+	/// <param name="item"> pointer to the item </param>
 	virtual void obtainItem(std::shared_ptr<PhysicalItem> item) = 0;
+
+	/// <summary>
+	/// Abstract function that manages losing an item by a character.
+	/// </summary>
+	/// <param name="item"> pointer to the item </param>
 	virtual void loseItem(const std::shared_ptr<PhysicalItem> item) = 0;
 public:
+
+	// Allows PhysicalItem and Game classes to access private and protected members of class Character
 	friend class PhysicalItem;
 	friend class Game;
 
+	// Constructor
 	Character(const std::string nameString, int healthValue);
 
+	// Destructor
 	virtual ~Character();
 
+	/// <summary>
+	/// Getter for name.
+	/// </summary>
+	/// <returns> the name of the character </returns>
 	std::string getName() const;
 
+	/// <summary>
+	/// Getter for health points.
+	/// </summary>
+	/// <returns>current health points of the character </returns>
 	int getHp() const;
 
+	/// <summary>
+	/// Operator to compare two Characters.
+	/// </summary>
+	/// <param name="other"> comparing character </param>
+	/// <returns>true if compared charcter is bigger than comparing one</returns>
 	bool operator > (const Character& other) const;
 
+	/// <summary>
+	/// Operator to compare two Characters.
+	/// </summary>
+	/// <param name="other"> comparing character </param>
+	/// <returns> true if compared charcter is less than comparing one </returns>
 	bool operator < (const Character& other) const;
 
-	virtual void print(std::ostream& out) const = 0;
+	/// <summary>
+	/// Abstract function to print information about a character to the output stream.
+	/// </summary>
+	/// <param name="out"> reference to the output stream </param>
+	/// <returns> reference to the output stream </returns>
+	virtual std::ostream& print(std::ostream& out) const = 0;
 };
 
+/// <summary>
+/// Singleton class Game to represent a
+/// single game session.
+/// </summary>
 class Game {
 private:
+	// Singlton instance
 	static std::shared_ptr<Game> game;
+
+	// Container of alive characters
 	Container<Character> characters;
+
+	// Input stream
 	std::ifstream input;
+
+	// Output stream
 	std::ofstream output;
 
+	/// <summary>
+	/// Function to get Character instance from the container.
+	/// </summary>
+	/// <param name="name"> name of the character </param>
+	/// <returns> pointer to the character instance </returns>
 	std::shared_ptr<Character> getCharacterByName(std::string name) const;
 
+	/// <summary>
+	/// Displays information of alive characters in the lexicographical order of names.
+	/// </summary>
 	void showCharacters();
 
+	// Private constructor
 	Game();
 public:
 
+	/// <summary>
+	/// Entry point of the game.
+	/// Deals with reading input and processing commands.
+	/// </summary>
 	void startNewGame();
 
+	/// <summary>
+	/// Instance getter.
+	/// </summary>
+	/// <returns> pointer to the Game instance </returns>
 	static std::shared_ptr<Game> currentGame();
 
+	/// <summary>
+	/// Procedure to remove a character from the game.
+	/// </summary>
+	/// <param name="ptr"> pointer to the character instance </param>
 	void destroyCharacter(std::shared_ptr<Character> ptr);
 
+	/// <summary>
+	/// Getter for the output stream.
+	/// </summary>
+	/// <returns> the reference to the output stream </returns>
 	std::ofstream& getOutput();
 };
 
@@ -249,6 +427,8 @@ Container<T>::Container() : map() {}
 
 template<DerivedFromPhysicalItem T>
 Container<T>::~Container() {
+
+	// Destroying elements stored in the container
 	for (auto it = map.begin(); it != map.end(); ++it) {
 		auto& itemPtr = it->second;
 		itemPtr.reset();
@@ -305,6 +485,8 @@ ContainerWithMaxCapacity<T>::~ContainerWithMaxCapacity() = default;
 
 template<ComparableAndPritable T>
 void ContainerWithMaxCapacity<T>::addItem(std::shared_ptr<T> newItem) {
+
+	// Additional check for available space
 	if (this->size() == maxCapacity) {
 		throw FullContainer();
 	}
@@ -313,11 +495,19 @@ void ContainerWithMaxCapacity<T>::addItem(std::shared_ptr<T> newItem) {
 
 template<ComparableAndPritable T>
 void ContainerWithMaxCapacity<T>::show() const {
+
+	// Vector of the elements
 	auto v = this->getElements();
+
+	// Instance of the game
 	auto game = Game::currentGame();
+
+	// Sorting elements
 	std::sort(v.begin(), v.end(), [](const std::shared_ptr<T> first, const std::shared_ptr<T> second) {
 		return (*first < *second);
-	});
+		});
+
+	// Printing elements
 	for (auto& element : v) {
 		element->print(sysout);
 	}
@@ -328,8 +518,12 @@ void ContainerWithMaxCapacity<T>::show() const {
 
 void Character::takeDamage(int damage) {
 	healthPoints -= damage;
+
+	// Check whether a character is alive
 	if (healthPoints <= 0) {
 		auto game = Game::currentGame();
+
+		// Remove dead character from the game
 		game->destroyCharacter(this->shared_from_this());
 	}
 }
@@ -351,95 +545,192 @@ int Character::getHp() const {
 }
 
 bool Character::operator > (const Character& other) const {
+	// Lexicographical comparison
 	return (name.compare(other.getName()) > 0);
 }
 
 bool Character::operator < (const Character& other) const {
+	// Lexicographical comparison
 	return (name.compare(other.getName()) < 0);
 }
 
+/// <summary>
+/// Abstract class PhysicalItem represents an item that
+/// a character can store or use during the game session.
+/// 
+/// The class enables creating shared pointers from an instance.
+/// </summary>
 class PhysicalItem : public std::enable_shared_from_this<PhysicalItem> {
 private:
+	// States whether an item cannot be used more than once
 	bool isUsableOnce;
+
+	// Name of an item
 	std::string name;
 protected:
+
+	// The owner of an item
 	std::shared_ptr<Character> owner;
 
+	/// <summary>
+	/// Getter for the owner.
+	/// </summary>
+	/// <returns> pointer to the character instance </returns>
 	std::shared_ptr<Character> getOwner() const {
 		return owner;
 	}
 
-	void useCondition(const std::shared_ptr<const Character> user, std::shared_ptr<Character> target, const std::string& itemName) {
+	/// <summary>
+	/// Handles checks for the use of an item.
+	/// </summary>
+	/// <param name="user"> owner of the item </param>
+	/// <param name="target"> target to use item on </param>
+	void useCondition(const std::shared_ptr<const Character> user, std::shared_ptr<Character> target) {
+
+		// Owner check
 		if (user != owner) {
 			throw CharacterDoesNotOwnItem();
 		}
 
-		useLogic(user, target, itemName);
+		// Applying item
+		useLogic(user, target);
 
+		// Destroying an item after use
 		if (isUsableOnce) {
 			afterUse();
 		}
 	}
 
-	virtual void useLogic(const std::shared_ptr<const Character> user, std::shared_ptr<Character> target, const std::string& itemName) const = 0;
+	/// <summary>
+	/// Abstract function to apply element of a user on a target.
+	/// </summary>
+	/// <param name="user">owner of the item</param>
+	/// <param name="target">target to use item on</param>
+	virtual void useLogic(const std::shared_ptr<const Character> user, std::shared_ptr<Character> target) const = 0;
 
+	/// <summary>
+	/// Deals with item destruction after use.
+	/// </summary>
 	void afterUse() {
 		owner->loseItem(this->shared_from_this());
 	}
 
+	/// <summary>
+	/// Deals with giving damage to a given character.
+	/// </summary>
+	/// <param name="to"> reciever of damage </param>
+	/// <param name="damage"> damage value </param>
 	void giveDamageTo(const std::shared_ptr<Character> to, int damage) const {
 		to->takeDamage(damage);
 	}
 
+	/// <summary>
+	/// Deals with healing a given character.
+	/// </summary>
+	/// <param name="to"> reciever of heal</param>
+	/// <param name="heal"> heal value </param>
 	void giveHealTo(const std::shared_ptr<Character> to, int heal) const {
 		to->heal(heal);
 	}
 public:
+
+	// Constructor
 	PhysicalItem(bool isUsableOnce, const std::shared_ptr<Character> owner, const std::string name) : isUsableOnce(isUsableOnce), name(name), owner(owner) {}
 
+	// Destructor
 	virtual ~PhysicalItem() = default;
 
-	void use(const std::shared_ptr<const Character> user, std::shared_ptr<Character> target, const std::string& itemName) {
-		useCondition(user, target, itemName);
+	/// <summary>
+	/// Function that provides the use of an item.
+	/// </summary>
+	/// <param name="user"> owner of the item </param>
+	/// <param name="target"> target to use item on </param>
+	void use(const std::shared_ptr<const Character> user, std::shared_ptr<Character> target) {
+		useCondition(user, target);
 	}
 
+	/// <summary>
+	/// Getter for the name.
+	/// </summary>
+	/// <returns> name of the item </returns>
 	std::string getName() const {
 		return name;
 	}
 
+	/// <summary>
+	/// Operator to compare two PhisicalItems.
+	/// </summary>
+	/// <param name="other">comparing item</param>
+	/// <returns> true if the compared item is bigger than the comparing item </returns>
 	bool operator > (const PhysicalItem& other) const {
 		return (name.compare(other.getName()) > 0);
 	}
 
+	/// <summary>
+	/// Operator to compare two PhisicalItems.
+	/// </summary>
+	/// <param name="other">comparing item</param>
+	/// <returns> true if the compared item is less than the comparing item </returns>
 	bool operator < (const PhysicalItem& other) const {
 		return (name.compare(other.getName()) < 0);
 	}
 
+	/// <summary>
+	/// Abstract function to print information about an item
+	/// to the output stream.
+	/// </summary>
+	/// <param name="out"> reference to the output stream</param>
+	/// <returns> reference to the output stream </returns>
 	virtual std::ostream& print(std::ostream& out) const = 0;
 };
 
+/// <summary>
+/// Class Weapon inherits from PhysicalItem and
+/// represents an item that can give damage to
+/// characters.
+/// </summary>
 class Weapon : public PhysicalItem {
 private:
 	int damage;
 
-	void useLogic(const std::shared_ptr<const Character> user, std::shared_ptr<Character> target, const std::string& itemName) const override {
+	/// <summary>
+	/// Implementation of the abstract function that
+	/// gives damage to target.
+	/// </summary>
+	/// <param name="user"> attacker</param>
+	/// <param name="target"> reciever of damage </param>
+	void useLogic(const std::shared_ptr<const Character> user, std::shared_ptr<Character> target) const override {
 		auto game = Game::currentGame();
-		sysout << user->getName() << " attacks " << target->getName() << " with their " << itemName << "!\n";
+		sysout << user->getName() << " attacks " << target->getName() << " with their " << getName() << "!\n";
 		giveDamageTo(target, getDamage());
 	}
 public:
+
+	// Constructor
 	Weapon(const std::shared_ptr<Character> owner, const std::string name, int damage) : PhysicalItem(false, owner, name), damage(damage) {
+
+		// Check for legal damage value
 		if (damage <= 0) {
 			throw IllegalDamageValue();
 		}
 	}
 
+	// Destructor
 	~Weapon() = default;
 
+	/// <summary>
+	/// Getter for damage value.
+	/// </summary>
+	/// <returns> damage value </returns>
 	int getDamage() const {
 		return damage;
 	}
 
+	/// <summary>
+	/// Implementation of the print function.
+	/// </summary>
+	/// <param name="out"> reference to the output stream </param>
+	/// <returns> reference to the output stream </returns>
 	std::ostream& print(std::ostream& out) const override {
 		out << getName() << ":" << getDamage() << " ";
 		return out;
@@ -447,43 +738,77 @@ public:
 
 };
 
+/// <summary>
+/// Class Potion inherits from PhysicalItem and
+/// represents an item that can heal characters.
+/// </summary>
 class Potion : public PhysicalItem {
 private:
 	int healValue;
 
-	void useLogic(const std::shared_ptr<const Character> user, std::shared_ptr<Character> target, const std::string& itemName) const override {
+	/// <summary>
+	/// Implementation of the abstract function that
+	/// heals target.
+	/// </summary>
+	/// <param name="user">healer</param>
+	/// <param name="target">reciever of heal</param>
+	void useLogic(const std::shared_ptr<const Character> user, std::shared_ptr<Character> target) const override {
 		auto game = Game::currentGame();
-		sysout << target->getName() << " drinks " << itemName << " from " << user->getName() << ".\n";
+		sysout << target->getName() << " drinks " << getName() << " from " << user->getName() << ".\n";
 		giveHealTo(target, getHealValue());
 	}
 public:
+
+	// Constructor
 	Potion(const std::shared_ptr<Character> owner, const std::string name, int healValue) : PhysicalItem(true, owner, name), healValue(healValue) {
 		if (healValue <= 0) {
 			throw IllegalHealthValue();
 		}
 	}
 
+	// Destructor
 	~Potion() = default;
 
+	/// <summary>
+	/// Getter for health value.
+	/// </summary>
+	/// <returns> heal value </returns>
 	int getHealValue() const {
 		return healValue;
 	}
 
+	/// <summary>
+	/// Implementation of the print function.
+	/// </summary>
+	/// <param name="out"> reference to the output stream </param>
+	/// <returns> reference to the output stream </returns>
 	std::ostream& print(std::ostream& out) const override {
 		out << getName() << ":" << getHealValue() << " ";
 		return out;
 	}
 };
 
+/// <summary>
+/// Class Spell inherits from PhysicalItem and
+/// represents an item that kill characters.
+/// </summary>
 class Spell : public PhysicalItem {
 private:
+
+	// List of instances that can a spell can be cast on
 	std::vector<std::shared_ptr<Character>> allowedTargets;
 
-	void useLogic(const std::shared_ptr<const Character> user, std::shared_ptr<Character> target, const std::string& itemName) const override {
+	/// <summary>
+	/// Implementation of the abstract function that
+	/// casts a spell on target.
+	/// </summary>
+	/// <param name="user"> caster </param>
+	/// <param name="target"> target to cast spell on</param>
+	void useLogic(const std::shared_ptr<const Character> user, std::shared_ptr<Character> target) const override {
 		for (auto& allowedTarget : allowedTargets) {
 			if (allowedTarget == target) {
 				auto game = Game::currentGame();
-				sysout << user->getName() << " casts " << itemName << " on " << target->getName() << "!\n";
+				sysout << user->getName() << " casts " << getName() << " on " << target->getName() << "!\n";
 				giveDamageTo(target, target->getHp());
 				return;
 			}
@@ -492,147 +817,256 @@ private:
 		throw NotAllowedTarget();
 	}
 public:
-	
+
+	// Constructor
 	Spell(const std::shared_ptr<Character> owner, const std::string name, const std::vector<std::shared_ptr<Character>>& allowedTargets) : PhysicalItem(true, owner, name), allowedTargets(allowedTargets) {}
 
+	// Destructor
 	~Spell() = default;
 
+	/// <summary>
+	/// Getter for the number of allowed targets.
+	/// </summary>
+	/// <returns> number of allowed targets </returns>
 	int getNumAllowedTargets() const {
 		return allowedTargets.size();
 	}
 
+	/// <summary>
+	/// Implementation of the print function.
+	/// </summary>
+	/// <param name="out"> reference to the output stream </param>
+	/// <returns> reference to the output stream </returns>
 	std::ostream& print(std::ostream& out) const override {
 		out << getName() << ":" << getNumAllowedTargets() << " ";
 		return out;
 	}
 };
 
+// Bindings of the Containers
+
 using Arsenal = ContainerWithMaxCapacity<Weapon>;
 using MedicalBag = ContainerWithMaxCapacity<Potion>;
 using SpellBook = ContainerWithMaxCapacity<Spell>;
 
+/// <summary>
+/// Class WeaponUser represents a character that is
+/// able to use weapons.
+/// </summary>
 class WeaponUser : virtual public Character {
 protected:
+
+	// Arsenal of weapons
 	Arsenal arsenal;
 public:
 
+	// Constructor
 	WeaponUser(const std::string nameString, int healthValue, int capacity) : Character(nameString, healthValue), arsenal(capacity) {}
 
+	// Destructor
 	~WeaponUser() = default;
 
+	/// <summary>
+	/// The function implements attack on the given character.
+	/// </summary>
+	/// <param name="target">reciever of damage</param>
+	/// <param name="weaponName">name of the weapon</param>
 	void attack(std::shared_ptr<Character> target, const std::string& weaponName) {
 		try {
 			auto item = arsenal.get(weaponName);
-			item->use(this->shared_from_this(), target, weaponName);
+			item->use(this->shared_from_this(), target);
 		}
 		catch (const ElementNotFound&) {
 			throw CharacterDoesNotOwnItem();
 		}
 	}
 
+	/// <summary>
+	/// Displays all weapons in the arsenal.
+	/// </summary>
 	void showWeapons() const {
 		arsenal.show();
 	}
 };
 
+/// <summary>
+/// Class PotionUser represents a character that is
+/// able to use potions.
+/// </summary>
 class PotionUser : virtual public Character {
 protected:
+
+	// Container of potions
 	MedicalBag medicalBag;
 public:
 
+	// Constructor
 	PotionUser(const std::string nameString, int healthValue, int capacity) : Character(nameString, healthValue), medicalBag(capacity) {}
 
+	// Destructor
 	~PotionUser() = default;
 
+	/// <summary>
+	/// The function implements drinking of a potion by a target.
+	/// </summary>
+	/// <param name="target">reciever of heal</param>
+	/// <param name="potionName">name of the potion</param>
 	void drink(std::shared_ptr<Character> target, const std::string& potionName) {
 		try {
 			auto item = medicalBag.get(potionName);
-			item->use(this->shared_from_this(), target, potionName);
+			item->use(this->shared_from_this(), target);
 		}
 		catch (const ElementNotFound&) {
 			throw CharacterDoesNotOwnItem();
 		}
 	}
 
+	/// <summary>
+	/// Displays all potions in the medicalBag.
+	/// </summary>
 	void showPotions() const {
 		medicalBag.show();
 	}
 };
 
+/// <summary>
+/// Class SpellUser represents a character that is
+/// able to cast spells.
+/// </summary>
 class SpellUser : virtual public Character {
 protected:
+
+	// Container of spells
 	SpellBook spellBook;
 public:
 
+	// Constructor
 	SpellUser(const std::string nameString, int healthValue, int capacity) : Character(nameString, healthValue), spellBook(capacity) {}
 
+	// Destructor
 	~SpellUser() = default;
 
+	/// <summary>
+	/// The function implements cast on a target.
+	/// </summary>
+	/// <param name="target"> target to cast spell on</param>
+	/// <param name="spellName"> name of the spell</param>
 	void cast(std::shared_ptr<Character> target, const std::string& spellName) {
 		try {
 			auto item = spellBook.get(spellName);
-			item->use(this->shared_from_this(), target, spellName);
+			item->use(this->shared_from_this(), target);
 		}
 		catch (const ElementNotFound&) {
 			throw CharacterDoesNotOwnItem();
 		}
 	}
 
+	/// <summary>
+	/// Displays all spells from the spellBook.
+	/// </summary>
 	void showSpells() const {
 		spellBook.show();
 	}
 };
 
+/// <summary>
+/// Class Fighter represents a character that can
+/// use weapons and potions.
+/// </summary>
 class Fighter : public WeaponUser, public PotionUser {
 protected:
+
+	/// <summary>
+	/// Implementation of the abstract function that inserts the item
+	/// into either the arsenal or the medicalBag.
+	/// </summary>
+	/// <param name="item"> pointer to the item </param>
 	void obtainItem(std::shared_ptr<PhysicalItem> item) override {
+
+		// Cast of item to Weapon
 		if (dynamic_cast<Weapon*>(item.get())) {
 			auto weapon = std::dynamic_pointer_cast<Weapon>(item);
 			arsenal.addItem(weapon);
 		}
+		// Cast of item to Potion
 		else if (dynamic_cast<Potion*>(item.get())) {
 			auto potion = std::dynamic_pointer_cast<Potion>(item);
 			medicalBag.addItem(potion);
 		}
+		// Element cannot be used by a fighter
 		else {
 			throw IllegalItemType();
 		}
 	}
 
+	/// <summary>
+	/// Implementation of the abstract function that removes the item
+	/// from either the arsenal or the medicalBag.
+	/// </summary>
+	/// <param name="item"> pointer to the item</param>
 	void loseItem(std::shared_ptr<PhysicalItem> item) override {
+
+		// Find the item in the arsenal
 		if (arsenal.find(item->getName())) {
 			arsenal.removeItem(item->getName());
 		}
+		// Find the item in the medicalBag
 		else {
 			medicalBag.removeItem(item->getName());
 		}
-		
+
+		// Release data
 		item.reset();
 	}
 public:
+
+	// Constructor
 	Fighter(const std::string nameString, int healthValue) : Character(nameString, healthValue), WeaponUser(nameString, healthValue, maxAllowedWeapons), PotionUser(nameString, healthValue, maxAllowedPotions) {}
 
+	// Destructor
 	~Fighter() = default;
 
-	void print(std::ostream& out) const override {
+	/// <summary>
+	/// Implementation of the print function.
+	/// </summary>
+	/// <param name="out"> reference to the output stream </param>
+	/// <returns> reference to the output stream </returns>
+	std::ostream& print(std::ostream& out) const override {
 		out << getName() << ":fighter:" << getHp() << " ";
 	}
 
+	// Maximum allowed number of weapons
 	static int maxAllowedWeapons;
+
+	// Maximum allowed number of potions
 	static int maxAllowedPotions;
 };
 
+/// <summary>
+/// Class Archer represents a character that can
+/// use weapons, potions, and spells.
+/// </summary>
 class Archer : public WeaponUser, public PotionUser, public SpellUser {
 protected:
+
+	/// <summary>
+	/// Implementation of the abstract function that inserts the item
+	/// into either the arsenal.the medicalBag, or the spellBook.
+	/// </summary>
+	/// <param name="item">pointer to the item </param>
 	void obtainItem(std::shared_ptr<PhysicalItem> item) override {
+
+		// Cast the item to the Weapon
 		if (dynamic_cast<Weapon*>(item.get())) {
 			auto weapon = std::dynamic_pointer_cast<Weapon>(item);
 			arsenal.addItem(weapon);
 		}
+		// Cast the item to the Potion
 		else if (dynamic_cast<Potion*>(item.get())) {
 			auto potion = std::dynamic_pointer_cast<Potion>(item);
 			medicalBag.addItem(potion);
 		}
+		// Cast the item to the Spell
 		else if (dynamic_cast<Spell*>(item.get())) {
 			auto spell = std::dynamic_pointer_cast<Spell>(item);
 			spellBook.addItem(spell);
@@ -642,13 +1076,22 @@ protected:
 		}
 	}
 
+	/// <summary>
+	/// Implementation of the abstract function that removes the item
+	/// from either the arsenal, the medicalBag, or the spellBook.
+	/// </summary>
+	/// <param name="item"> pointer to the item </param>
 	void loseItem(std::shared_ptr<PhysicalItem> item) override {
+
+		// Find the item in the arsenal
 		if (arsenal.find(item->getName())) {
 			arsenal.removeItem(item->getName());
 		}
+		// Find the item in the medicalBag
 		else if (medicalBag.find(item->getName())) {
 			medicalBag.removeItem(item->getName());
 		}
+		// Find the item in the spellBook
 		else {
 			spellBook.removeItem(item->getName());
 		}
@@ -656,55 +1099,100 @@ protected:
 		item.reset();
 	}
 public:
+
+	// Constructor
 	Archer(const std::string nameString, int healthValue) : Character(nameString, healthValue), WeaponUser(nameString, healthValue, maxAllowedWeapons), PotionUser(nameString, healthValue, maxAllowedPotions), SpellUser(nameString, healthValue, maxAllowedSpells) {}
 
+	// Destructor
 	~Archer() = default;
 
-	void print(std::ostream& out) const override {
+	/// <summary>
+	/// Implementation of the print function.
+	/// </summary>
+	/// <param name="out"> reference to the output stream </param>
+	/// <returns> reference to the output stream </returns>
+	std::ostream& print(std::ostream& out) const override {
 		out << getName() << ":archer:" << getHp() << " ";
 	}
 
+	// Maximum allowed number of weapons
 	static int maxAllowedWeapons;
+
+	// Maximum allowed number of potions
 	static int maxAllowedPotions;
+
+	// Maximum allowed number of spells
 	static int maxAllowedSpells;
 };
 
+/// <summary>
+/// Class Wizard represents a character that can
+/// use potions and spells.
+/// </summary>
 class Wizard : public PotionUser, public SpellUser {
 protected:
+
+	/// <summary>
+	/// Implementation of the abstract function that inserts the item
+	/// into either the medicalBag or the spellBook.
+	/// </summary>
+	/// <param name="item"></param>
 	void obtainItem(std::shared_ptr<PhysicalItem> item) override {
+		// Cast to Potion
 		if (dynamic_cast<Potion*>(item.get())) {
 			auto potion = std::dynamic_pointer_cast<Potion>(item);
 			medicalBag.addItem(potion);
 		}
+		// Cast to Spell
 		else if (dynamic_cast<Spell*>(item.get())) {
 			auto spell = std::dynamic_pointer_cast<Spell>(item);
 			spellBook.addItem(spell);
 		}
+		// Wizard cannot use such item
 		else {
 			throw IllegalItemType();
 		}
 	}
 
+	/// <summary>
+	/// Implementation of the abstract function that removes the item
+	/// from either the medicalBag or the spellBook.
+	/// </summary>
+	/// <param name="item"></param>
 	void loseItem(std::shared_ptr<PhysicalItem> item) override {
+		// Find the item in the medicalBag
 		if (medicalBag.find(item->getName())) {
 			medicalBag.removeItem(item->getName());
 		}
+		// Find the item in the spellBook
 		else {
 			spellBook.removeItem(item->getName());
 		}
 
+		// Release data
 		item.reset();
 	}
 public:
+
+	// Constructor
 	Wizard(const std::string nameString, int healthValue) : Character(nameString, healthValue), PotionUser(nameString, healthValue, maxAllowedPotions), SpellUser(nameString, healthValue, maxAllowedSpells) {}
 
+	// Destructor
 	~Wizard() = default;
 
-	void print(std::ostream& out) const override {
+	/// <summary>
+	/// Implementation of the print function.
+	/// </summary>
+	/// <param name="out"> reference to the output stream </param>
+	/// <returns> reference to the output stream </returns>
+	std::ostream& print(std::ostream& out) const override {
 		out << getName() << ":wizard:" << getHp() << " ";
 	}
 
+	// Maximum allowed number of potions
 	static int maxAllowedPotions;
+
+	// Maximum allowed number of spells
 	static int maxAllowedSpells;
 };
 
@@ -724,11 +1212,16 @@ std::shared_ptr<Character> Game::getCharacterByName(std::string name) const {
 }
 
 void Game::showCharacters() {
+
+	// Get the vector of alive characters
 	auto vec = characters.getElements();
+
+	// Sort characters by name
 	std::sort(vec.begin(), vec.end(), [](const std::shared_ptr<Character> first, const std::shared_ptr<Character> second) {
 		return (*first < *second);
-	});
+		});
 
+	// Ouput characters information
 	for (auto& character : vec) {
 		character->print(output);
 	}
@@ -737,11 +1230,17 @@ void Game::showCharacters() {
 }
 
 Game::Game() {
+	// Input stream
 	input.open("input.txt");
+
+	// Output stream
 	output.open("output.txt");
 }
 
 void Game::startNewGame() {
+
+	// Processing Input
+
 	int N; input >> N;
 	for (int i = 0; i < N; ++i) {
 		std::string first;
@@ -771,7 +1270,7 @@ void Game::startNewGame() {
 				else {
 					throw std::runtime_error("Unexpected command");
 				}
-					
+
 				characters.addItem(newChararcter);
 			}
 			else if (second == "item") {
@@ -784,7 +1283,7 @@ void Game::startNewGame() {
 						int damageValue; input >> damageValue;
 						auto owner = getCharacterByName(ownerName);
 
-						std::shared_ptr<Weapon> newWeapon(new Weapon(owner, weaponName, damageValue));
+						std::shared_ptr<Weapon> newWeapon = std::make_shared<Weapon>(owner, weaponName, damageValue);
 						owner->obtainItem(newWeapon);
 						output << ownerName << " just obtained a new weapon called " << weaponName << ".\n";
 					}
@@ -812,7 +1311,7 @@ void Game::startNewGame() {
 						int healValue; input >> healValue;
 						auto owner = getCharacterByName(ownerName);
 
-						std::shared_ptr<Potion> newPotion(new Potion(owner, potionName, healValue));
+						std::shared_ptr<Potion> newPotion = std::make_shared<Potion>(owner, potionName, healValue);
 						owner->obtainItem(newPotion);
 						output << ownerName << " just obtained a new potion called " << potionName << ".\n";
 					}
@@ -856,7 +1355,7 @@ void Game::startNewGame() {
 							allowedTargets.push_back(target);
 						}
 
-						std::shared_ptr<Spell> newSpell(new Spell(owner, spellName, allowedTargets));
+						std::shared_ptr<Spell> newSpell = std::make_shared<Spell>(owner, spellName, allowedTargets);
 						owner->obtainItem(newSpell);
 						output << ownerName << " just obtained a new spell called " << spellName << ".\n";
 					}
@@ -889,7 +1388,8 @@ void Game::startNewGame() {
 
 				auto attacker = getCharacterByName(attackerName);
 				auto target = getCharacterByName(targetName);
-					
+
+				// Check whether the character can use weapons
 				if (dynamic_cast<WeaponUser*>(attacker.get())) {
 					auto weaponUser = std::dynamic_pointer_cast<WeaponUser>(attacker);
 					weaponUser->attack(target, weaponName);
@@ -921,6 +1421,7 @@ void Game::startNewGame() {
 				auto caster = getCharacterByName(casterName);
 				auto target = getCharacterByName(targetName);
 
+				// Check whether the character can use spells
 				if (dynamic_cast<SpellUser*>(caster.get())) {
 					auto spellUser = std::dynamic_pointer_cast<SpellUser>(caster);
 					spellUser->cast(target, spellName);
@@ -986,7 +1487,7 @@ void Game::startNewGame() {
 					getCharacterByName(speaker);
 					output << speaker << ": ";
 				}
-				
+
 				output << speech << std::endl;
 			}
 			catch (const CharacterDoesNotExist&) {
@@ -1004,6 +1505,8 @@ void Game::startNewGame() {
 				try {
 					std::string characterName; input >> characterName;
 					auto owner = getCharacterByName(characterName);
+
+					// Check whether the character can use weapons
 					if (dynamic_cast<WeaponUser*>(owner.get())) {
 						auto weaponUser = std::dynamic_pointer_cast<WeaponUser>(owner);
 						weaponUser->showWeapons();
@@ -1038,6 +1541,8 @@ void Game::startNewGame() {
 				try {
 					std::string characterName; input >> characterName;
 					auto owner = getCharacterByName(characterName);
+
+					// Check whether the character can use spells
 					if (dynamic_cast<SpellUser*>(owner.get())) {
 						auto spellUser = std::dynamic_pointer_cast<SpellUser>(owner);
 						spellUser->showSpells();
@@ -1061,13 +1566,15 @@ void Game::startNewGame() {
 		}
 	}
 
+	// Closing files
+
 	input.close();
 	output.close();
 }
 
 std::shared_ptr<Game> Game::currentGame() {
 	if (game == nullptr) {
-		game.reset(new Game());
+		game = std::make_shared<Game>();
 	}
 	return game;
 }
@@ -1082,6 +1589,8 @@ std::ofstream& Game::getOutput() {
 	return output;
 }
 
+// Setting the static variables
+
 inline int Fighter::maxAllowedWeapons{ 3 };
 inline int Fighter::maxAllowedPotions{ 5 };
 
@@ -1093,6 +1602,8 @@ inline int Wizard::maxAllowedPotions{ 10 };
 inline int Wizard::maxAllowedSpells{ 10 };
 
 int main() {
+
+	// Start of game session
 	auto game = Game::currentGame();
 	game->startNewGame();
 	return 0;
