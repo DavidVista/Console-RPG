@@ -357,8 +357,7 @@ public:
 	/// Abstract function to print information about a character to the output stream.
 	/// </summary>
 	/// <param name="out"> reference to the output stream </param>
-	/// <returns> reference to the output stream </returns>
-	virtual std::ostream& print(std::ostream& out) const = 0;
+	virtual void print(std::ostream& out) const = 0;
 };
 
 /// <summary>
@@ -680,8 +679,7 @@ public:
 	/// to the output stream.
 	/// </summary>
 	/// <param name="out"> reference to the output stream</param>
-	/// <returns> reference to the output stream </returns>
-	virtual std::ostream& print(std::ostream& out) const = 0;
+	virtual void print(std::ostream& out) const = 0;
 };
 
 /// <summary>
@@ -730,10 +728,8 @@ public:
 	/// Implementation of the print function.
 	/// </summary>
 	/// <param name="out"> reference to the output stream </param>
-	/// <returns> reference to the output stream </returns>
-	std::ostream& print(std::ostream& out) const override {
+	void print(std::ostream& out) const override {
 		out << getName() << ":" << getDamage() << " ";
-		return out;
 	}
 
 };
@@ -781,10 +777,8 @@ public:
 	/// Implementation of the print function.
 	/// </summary>
 	/// <param name="out"> reference to the output stream </param>
-	/// <returns> reference to the output stream </returns>
-	std::ostream& print(std::ostream& out) const override {
+	void print(std::ostream& out) const override {
 		out << getName() << ":" << getHealValue() << " ";
-		return out;
 	}
 };
 
@@ -836,10 +830,8 @@ public:
 	/// Implementation of the print function.
 	/// </summary>
 	/// <param name="out"> reference to the output stream </param>
-	/// <returns> reference to the output stream </returns>
-	std::ostream& print(std::ostream& out) const override {
+	void print(std::ostream& out) const override {
 		out << getName() << ":" << getNumAllowedTargets() << " ";
-		return out;
 	}
 };
 
@@ -1030,8 +1022,7 @@ public:
 	/// Implementation of the print function.
 	/// </summary>
 	/// <param name="out"> reference to the output stream </param>
-	/// <returns> reference to the output stream </returns>
-	std::ostream& print(std::ostream& out) const override {
+	void print(std::ostream& out) const override {
 		out << getName() << ":fighter:" << getHp() << " ";
 	}
 
@@ -1110,8 +1101,7 @@ public:
 	/// Implementation of the print function.
 	/// </summary>
 	/// <param name="out"> reference to the output stream </param>
-	/// <returns> reference to the output stream </returns>
-	std::ostream& print(std::ostream& out) const override {
+	void print(std::ostream& out) const override {
 		out << getName() << ":archer:" << getHp() << " ";
 	}
 
@@ -1184,8 +1174,7 @@ public:
 	/// Implementation of the print function.
 	/// </summary>
 	/// <param name="out"> reference to the output stream </param>
-	/// <returns> reference to the output stream </returns>
-	std::ostream& print(std::ostream& out) const override {
+	void print(std::ostream& out) const override {
 		out << getName() << ":wizard:" << getHp() << " ";
 	}
 
