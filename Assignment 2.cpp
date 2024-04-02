@@ -1563,7 +1563,7 @@ void Game::startNewGame() {
 
 std::shared_ptr<Game> Game::currentGame() {
 	if (game == nullptr) {
-		game = std::make_shared<Game>();
+		game.reset(new Game());
 	}
 	return game;
 }
