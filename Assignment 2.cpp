@@ -534,15 +534,15 @@ std::vector<std::shared_ptr<T>> Container<T>::getElements() const
 
 // Container with Max Capacity Methods
 
-template<ComparableAndPritable T>
+template<ComparableAndPrintable T>
 ContainerWithMaxCapacity<T>::ContainerWithMaxCapacity(int maxCapacity)
     : Container<T>(), maxCapacity(maxCapacity)
 {}
 
-template<ComparableAndPritable T>
+template<ComparableAndPrintable T>
 ContainerWithMaxCapacity<T>::~ContainerWithMaxCapacity() = default;
 
-template<ComparableAndPritable T>
+template<ComparableAndPrintable T>
 void ContainerWithMaxCapacity<T>::addItem(std::shared_ptr<T> newItem)
 {
 
@@ -553,7 +553,7 @@ void ContainerWithMaxCapacity<T>::addItem(std::shared_ptr<T> newItem)
     this->Container<T>::addItem(newItem);
 }
 
-template<ComparableAndPritable T>
+template<ComparableAndPrintable T>
 void ContainerWithMaxCapacity<T>::show() const
 {
 
@@ -1407,7 +1407,7 @@ void Game::startNewGame()
                     throw std::runtime_error("Unexpected command");
                 }
 
-                characters.addItem(newChararcter);
+                characters.addItem(newCharacter);
             }
             else if (second == "item") {
                 std::string third;
