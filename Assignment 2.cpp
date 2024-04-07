@@ -5,66 +5,82 @@
 #include <fstream>
 #include <memory>
 
-// Output stream
+// Output stream shortcut
 
 #define sysout game->getOutput()
 
 // Exceptions
 
-class CharacterDoesNotOwnItem : public std::exception {
+class CharacterDoesNotOwnItem: public std::exception
+{
 public:
-	const char* what() {
-		return "Character doesn't exist";
-	}
+    const char *what()
+    {
+        return "Character doesn't exist";
+    }
 };
 
-class CharacterDoesNotExist : public std::exception {
+class CharacterDoesNotExist: public std::exception
+{
 public:
-	const char* what() {
-		return "Character doesn't own an item";
-	}
+    const char *what()
+    {
+        return "Character doesn't own an item";
+    }
 };
 
-class IllegalHealthValue : public std::exception {
+class IllegalHealthValue: public std::exception
+{
 public:
-	const char* what() {
-		return "Negative value or zero for a potion healValue";
-	}
+    const char *what()
+    {
+        return "Negative value or zero for a potion healValue";
+    }
 };
 
-class IllegalDamageValue : public std::exception {
+class IllegalDamageValue: public std::exception
+{
 public:
-	const char* what() {
-		return "Negative value or zero for a weapon's damageValue";
-	}
+    const char *what()
+    {
+        return "Negative value or zero for a weapon's damageValue";
+    }
 };
 
-class NotAllowedTarget : public std::exception {
+class NotAllowedTarget: public std::exception
+{
 public:
-	const char* what() {
-		return "Target is not in the list of allowed targets in casting spells";
-	}
+    const char *what()
+    {
+        return "Target is not in the list of allowed targets in casting spells";
+    }
 };
 
-class FullContainer : public std::exception {
+class FullContainer: public std::exception
+{
 public:
-	const char* what() {
-		return "Arsenal, MedicalBag, or SpellBook are full";
-	}
+    const char *what()
+    {
+        return "Arsenal, MedicalBag, or SpellBook are full";
+    }
 };
 
-class IllegalItemType : public std::exception {
+class IllegalItemType: public std::exception
+{
 public:
-	const char* what() {
-		return "Character can't carry or use a certain item";
-	}
+    const char *what()
+    {
+        return "Character can't carry or use a certain item";
+    }
 };
 
-class ElementNotFound : public std::exception {
+class ElementNotFound: public std::exception
+{
 public:
-	const char* what() {
-		return "No such element in a container";
-	}
+    const char *what()
+    {
+        return "No such element in a container";
+    }
 };
 
 // Forward Declarations of Classes
@@ -95,20 +111,40 @@ concept DerivedFromPhysicalItem = std::derived_from<T, PhysicalItem>;
 /// </summary>
 template<typename T>
 concept Printable =
-	requires (std::ostream & os, T x) { x.print(os); };
+    requires(std::ostream & os, T
+
+x) {
+x.
+
+print(os);
+
+};
 
 /// <summary>
 /// Concept to accept classes, supporting comparing instances.
 /// </summary>
 template<typename T>
 concept Comparable =
-	requires (T x, T y) { x > y; x < y; };
+    requires(T
+
+x,
+
+T y
+
+) {
+x >
+
+y;
+
+x<y;
+
+};
 
 /// <summary>
 /// Concept to accept classes, both implementing printing and supporting comparing.
 /// </summary>
 template<typename T>
-concept ComparableAndPritable = Printable<T> && Comparable<T>;
+concept ComparableAndPrintable = Printable<T> && Comparable<T>;
 
 // Classes
 
@@ -117,76 +153,85 @@ concept ComparableAndPritable = Printable<T> && Comparable<T>;
 /// </summary>
 /// <typeparam name="T"> template parameter </typeparam>
 template<typename T>
-class Container {
+class Container
+{
 private:
-	std::vector<std::shared_ptr<T>> elements;
+    std::vector<std::shared_ptr<T>> elements;
 public:
 
-	// Constructor
-	Container() : elements() {}
+    // Constructor
+    Container()
+        : elements()
+    {}
 
-	// Destructor
-	virtual ~Container() {
+    // Destructor
+    virtual ~Container()
+    {
 
-		// Destroying elements in container
-		for (auto& itemPtr : elements) {
-			itemPtr.reset();
-		}
-	}
+        // Destroying elements in container
+        for (auto &itemPtr: elements) {
+            itemPtr.reset();
+        }
+    }
 
-	/// <summary>
-	/// Getter for size.
-	/// </summary>
-	/// <returns>size of the container</returns>
-	int size() const {
-		return elements.size();
-	}
+    /// <summary>
+    /// Getter for size.
+    /// </summary>
+    /// <returns>size of the container</returns>
+    int size() const
+    {
+        return elements.size();
+    }
 
-	/// <summary>
-	/// Function to determine existence of an element in the container.
-	/// </summary>
-	/// <param name="item"> pointer to the item stored in the container </param>
-	/// <returns> true if item is present else false </returns>
-	bool find(const std::shared_ptr<const T> item) const {
-		for (auto& element : elements) {
-			if (element == item) {
-				return true;
-			}
-		}
+    /// <summary>
+    /// Function to determine existence of an element in the container.
+    /// </summary>
+    /// <param name="item"> pointer to the item stored in the container </param>
+    /// <returns> true if item is present else false </returns>
+    bool find(const std::shared_ptr<const T> item) const
+    {
+        for (auto &element: elements) {
+            if (element == item) {
+                return true;
+            }
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	/// <summary>
-	/// Removes the item from the container.
-	/// </summary>
-	/// <param name="newItem"> pointer to the item stored in the container </param>
-	void removeItem(const std::shared_ptr<const T> newItem) {
-		for (int i = 0; i < elements.size(); ++i) {
-			if (elements[i] == newItem) {
-				elements.erase(elements.begin() + i);
-				return;
-			}
-		}
+    /// <summary>
+    /// Removes the item from the container.
+    /// </summary>
+    /// <param name="newItem"> pointer to the item stored in the container </param>
+    void removeItem(const std::shared_ptr<const T> newItem)
+    {
+        for (int i = 0; i < elements.size(); ++i) {
+            if (elements[i] == newItem) {
+                elements.erase(elements.begin() + i);
+                return;
+            }
+        }
 
-		throw ElementNotFound();
-	}
+        throw ElementNotFound();
+    }
 
-	/// <summary>
-	/// Inserts an element into the container.
-	/// </summary>
-	/// <param name="newItem"> pointer to the item </param>
-	virtual void addItem(std::shared_ptr<T> newItem) {
-		elements.push_back(newItem);
-	}
+    /// <summary>
+    /// Inserts an element into the container.
+    /// </summary>
+    /// <param name="newItem"> pointer to the item </param>
+    virtual void addItem(std::shared_ptr<T> newItem)
+    {
+        elements.push_back(newItem);
+    }
 
-	/// <summary>
-	/// Getter for the vector of elements.
-	/// </summary>
-	/// <returns> vector of the elements stored in the container </returns>
-	std::vector<std::shared_ptr<T>> getElements() const {
-		return elements;
-	}
+    /// <summary>
+    /// Getter for the vector of elements.
+    /// </summary>
+    /// <returns> vector of the elements stored in the container </returns>
+    std::vector<std::shared_ptr<T>> getElements() const
+    {
+        return elements;
+    }
 };
 
 /// <summary>
@@ -195,56 +240,57 @@ public:
 /// </summary>
 /// <typeparam name="T"> template parameter requiring concept DerivedFromPhysicalItem </typeparam>
 template<DerivedFromPhysicalItem T>
-class Container<T> {
+class Container<T>
+{
 private:
-	// Map to store pair with key of item name and value of pointer to item instance
-	std::unordered_map<std::string, std::shared_ptr<T>> map;
+    // Map to store pair with key of item name and value of pointer to item instance
+    std::unordered_map<std::string, std::shared_ptr<T>> map;
 public:
 
-	// Constructor
-	Container();
+    // Constructor
+    Container();
 
-	// Destructor
-	virtual ~Container();
+    // Destructor
+    virtual ~Container();
 
-	/// <summary>
-	/// Getter for size.
-	/// </summary>
-	/// <returns> size of the container </returns>
-	int size() const;
+    /// <summary>
+    /// Getter for size.
+    /// </summary>
+    /// <returns> size of the container </returns>
+    int size() const;
 
-	/// <summary>
-	/// Inserts an element into the container.
-	/// </summary>
-	/// <param name="newItem"> pointer to the item instance </param>
-	virtual void addItem(std::shared_ptr<T> newItem);
+    /// <summary>
+    /// Inserts an element into the container.
+    /// </summary>
+    /// <param name="newItem"> pointer to the item instance </param>
+    virtual void addItem(std::shared_ptr<T> newItem);
 
-	/// <summary>
-	/// Removes the item from the container by the name.
-	/// </summary>
-	/// <param name="itemName"> name of the item </param>
-	void removeItem(const std::string& itemName);
+    /// <summary>
+    /// Removes the item from the container by the name.
+    /// </summary>
+    /// <param name="itemName"> name of the item </param>
+    void removeItem(const std::string &itemName);
 
-	/// <summary>
-	/// Function to determine existence of an element in the container
-	/// by the name.
-	/// </summary>
-	/// <param name="itemName"> name of the item</param>
-	/// <returns> true if present in the container else false</returns>
-	bool find(const std::string& itemName) const;
+    /// <summary>
+    /// Function to determine existence of an element in the container
+    /// by the name.
+    /// </summary>
+    /// <param name="itemName"> name of the item</param>
+    /// <returns> true if present in the container else false</returns>
+    bool find(const std::string &itemName) const;
 
-	/// <summary>
-	/// Gets the item from the container by the name.
-	/// </summary>
-	/// <param name="itemName"> name of the item </param>
-	/// <returns> the pointer to the item instance </returns>
-	std::shared_ptr<T> get(const std::string& itemName) const;
+    /// <summary>
+    /// Gets the item from the container by the name.
+    /// </summary>
+    /// <param name="itemName"> name of the item </param>
+    /// <returns> the pointer to the item instance </returns>
+    std::shared_ptr<T> get(const std::string &itemName) const;
 
-	/// <summary>
-	/// Getter for the vector of elements.
-	/// </summary>
-	/// <returns> the vector of pointers to the items stored in the container </returns>
-	std::vector<std::shared_ptr<T>> getElements() const;
+    /// <summary>
+    /// Getter for the vector of elements.
+    /// </summary>
+    /// <returns> the vector of pointers to the items stored in the container </returns>
+    std::vector<std::shared_ptr<T>> getElements() const;
 
 };
 
@@ -252,305 +298,330 @@ public:
 /// Template class inherits from Container class and represents a dynamic container of elements
 /// with limited capacity.
 /// </summary>
-/// <typeparam name="T"> template parameter requiring concept ComparableAndPritable</typeparam>
-template<ComparableAndPritable T>
-class ContainerWithMaxCapacity : public Container<T> {
+/// <typeparam name="T"> template parameter requiring concept ComparableAndPrintable</typeparam>
+template<ComparableAndPrintable T>
+class ContainerWithMaxCapacity: public Container<T>
+{
 private:
-	int maxCapacity;
+    int maxCapacity;
 public:
 
-	// Constructor
-	ContainerWithMaxCapacity(int maxCapacity);
+    // Constructor
+    ContainerWithMaxCapacity(int maxCapacity);
 
-	// Destructor
-	~ContainerWithMaxCapacity();
+    // Destructor
+    ~ContainerWithMaxCapacity();
 
-	/// <summary>
-	/// Overriden method to insert item with the check for available space.
-	/// </summary>
-	/// <param name="newItem"> pointer to the item </param>
-	void addItem(std::shared_ptr<T> newItem) override;
+    /// <summary>
+    /// Overridden method to insert item with the check for available space.
+    /// </summary>
+    /// <param name="newItem"> pointer to the item </param>
+    void addItem(std::shared_ptr<T> newItem) override;
 
-	/// <summary>
-	/// Displays elements in the container.
-	/// </summary>
-	void show() const;
+    /// <summary>
+    /// Displays elements in the container.
+    /// </summary>
+    void show() const;
 };
 
 /// <summary>
-/// * Abstract class Character represents a player
+/// Abstract class Character represents a player
 /// in the story.
 /// 
 /// The class enables creating shared pointers to an instance.
 /// </summary>
-class Character : public std::enable_shared_from_this<Character> {
+class Character: public std::enable_shared_from_this<Character>
+{
 private:
-	// Name of a character
-	std::string name;
+    // Name of a character
+    std::string name;
 
-	// Health points of a character
-	int healthPoints;
+    // Health points of a character
+    int healthPoints;
 
-	/// <summary>
-	/// Manages taking damage to a character.
-	/// </summary>
-	/// <param name="damage"> damage value </param>
-	void takeDamage(int damage);
+    /// <summary>
+    /// Manages taking damage to a character.
+    /// </summary>
+    /// <param name="damage"> damage value </param>
+    void takeDamage(int damage);
 
-	/// <summary>
-	/// Manages healing a character.
-	/// </summary>
-	/// <param name="healValue">heal value</param>
-	void heal(int healValue);
+    /// <summary>
+    /// Manages healing a character.
+    /// </summary>
+    /// <param name="healValue">heal value</param>
+    void heal(int healValue);
 protected:
-	
-	/// <summary>
-	/// Abstract function that manages obtaining an item by a character.
-	/// </summary>
-	/// <param name="item"> pointer to the item </param>
-	virtual void obtainItem(std::shared_ptr<PhysicalItem> item) = 0;
 
-	/// <summary>
-	/// Abstract function that manages losing an item by a character.
-	/// </summary>
-	/// <param name="item"> pointer to the item </param>
-	virtual void loseItem(const std::shared_ptr<PhysicalItem> item) = 0;
+    /// <summary>
+    /// Abstract function that manages obtaining an item by a character.
+    /// </summary>
+    /// <param name="item"> pointer to the item </param>
+    virtual void obtainItem(std::shared_ptr<PhysicalItem> item) = 0;
+
+    /// <summary>
+    /// Abstract function that manages losing an item by a character.
+    /// </summary>
+    /// <param name="item"> pointer to the item </param>
+    virtual void loseItem(const std::shared_ptr<PhysicalItem> item) = 0;
 public:
 
-	// Allows PhysicalItem and Game classes to access private and protected members of class Character
-	friend class PhysicalItem;
-	friend class Game;
+    // Allows PhysicalItem and Game classes to access private and protected members of class Character
+    friend class PhysicalItem;
+    friend class Game;
 
-	// Constructor
-	Character(const std::string nameString, int healthValue);
+    // Constructor
+    Character(const std::string nameString, int healthValue);
 
-	// Destructor
-	virtual ~Character();
+    // Destructor
+    virtual ~Character();
 
-	/// <summary>
-	/// Getter for name.
-	/// </summary>
-	/// <returns> the name of the character </returns>
-	std::string getName() const;
+    /// <summary>
+    /// Getter for name.
+    /// </summary>
+    /// <returns> the name of the character </returns>
+    std::string getName() const;
 
-	/// <summary>
-	/// Getter for health points.
-	/// </summary>
-	/// <returns>current health points of the character </returns>
-	int getHp() const;
+    /// <summary>
+    /// Getter for health points.
+    /// </summary>
+    /// <returns>current health points of the character </returns>
+    int getHp() const;
 
-	/// <summary>
-	/// Operator to compare two Characters.
-	/// </summary>
-	/// <param name="other"> comparing character </param>
-	/// <returns>true if compared charcter is bigger than comparing one</returns>
-	bool operator > (const Character& other) const;
+    /// <summary>
+    /// Operator to compare two Characters.
+    /// </summary>
+    /// <param name="other"> comparing character </param>
+    /// <returns>true if compared character is bigger than comparing one</returns>
+    bool operator>(const Character &other) const;
 
-	/// <summary>
-	/// Operator to compare two Characters.
-	/// </summary>
-	/// <param name="other"> comparing character </param>
-	/// <returns> true if compared charcter is less than comparing one </returns>
-	bool operator < (const Character& other) const;
+    /// <summary>
+    /// Operator to compare two Characters.
+    /// </summary>
+    /// <param name="other"> comparing character </param>
+    /// <returns> true if the compared character is less than the comparing one </returns>
+    bool operator<(const Character &other) const;
 
-	/// <summary>
-	/// Abstract function to print information about a character to the output stream.
-	/// </summary>
-	/// <param name="out"> reference to the output stream </param>
-	virtual void print(std::ostream& out) const = 0;
+    /// <summary>
+    /// Abstract function to print information about a character to the output stream.
+    /// </summary>
+    /// <param name="out"> reference to the output stream </param>
+    virtual void print(std::ostream &out) const = 0;
 };
 
 /// <summary>
 /// Singleton class Game to represent a
 /// single game session.
 /// </summary>
-class Game {
+class Game
+{
 private:
-	// Singlton instance
-	static std::shared_ptr<Game> game;
+    // Singleton instance
+    static std::shared_ptr<Game> game;
 
-	// Container of alive characters
-	Container<Character> characters;
+    // Container of alive characters
+    Container<Character> characters;
 
-	// Input stream
-	std::ifstream input;
+    // Input stream
+    std::ifstream input;
 
-	// Output stream
-	std::ofstream output;
+    // Output stream
+    std::ofstream output;
 
-	/// <summary>
-	/// Function to get Character instance from the container.
-	/// </summary>
-	/// <param name="name"> name of the character </param>
-	/// <returns> pointer to the character instance </returns>
-	std::shared_ptr<Character> getCharacterByName(std::string name) const;
+    /// <summary>
+    /// Function to get Character instance from the container.
+    /// </summary>
+    /// <param name="name"> name of the character </param>
+    /// <returns> pointer to the character instance </returns>
+    std::shared_ptr<Character> getCharacterByName(std::string name) const;
 
-	/// <summary>
-	/// Displays information of alive characters in the lexicographical order of names.
-	/// </summary>
-	void showCharacters();
+    /// <summary>
+    /// Displays information about alive characters in the lexicographical order of names.
+    /// </summary>
+    void showCharacters();
 
-	// Private constructor
-	Game();
+    // Private constructor
+    Game();
 public:
 
-	/// <summary>
-	/// Entry point of the game.
-	/// Deals with reading input and processing commands.
-	/// </summary>
-	void startNewGame();
+    /// <summary>
+    /// Entry point of the game.
+    /// Deals with reading input and processing commands.
+    /// </summary>
+    void startNewGame();
 
-	/// <summary>
-	/// Instance getter.
-	/// </summary>
-	/// <returns> pointer to the Game instance </returns>
-	static std::shared_ptr<Game> currentGame();
+    /// <summary>
+    /// Instance getter.
+    /// </summary>
+    /// <returns> pointer to the Game instance </returns>
+    static std::shared_ptr<Game> currentGame();
 
-	/// <summary>
-	/// Procedure to remove a character from the game.
-	/// </summary>
-	/// <param name="ptr"> pointer to the character instance </param>
-	void destroyCharacter(std::shared_ptr<Character> ptr);
+    /// <summary>
+    /// Procedure to remove a character from the game.
+    /// </summary>
+    /// <param name="ptr"> pointer to the character instance </param>
+    void destroyCharacter(std::shared_ptr<Character> ptr);
 
-	/// <summary>
-	/// Getter for the output stream.
-	/// </summary>
-	/// <returns> the reference to the output stream </returns>
-	std::ofstream& getOutput();
+    /// <summary>
+    /// Getter for the output stream.
+    /// </summary>
+    /// <returns> the reference to the output stream </returns>
+    std::ofstream &getOutput();
 };
 
 // Container for Physical Items Methods
 
 template<DerivedFromPhysicalItem T>
-Container<T>::Container() : map() {}
+Container<T>::Container()
+    : map()
+{}
 
 template<DerivedFromPhysicalItem T>
-Container<T>::~Container() {
+Container<T>::~Container()
+{
 
-	// Destroying elements stored in the container
-	for (auto it = map.begin(); it != map.end(); ++it) {
-		auto& itemPtr = it->second;
-		itemPtr.reset();
-	}
+    // Destroying elements stored in the container
+    for (auto it = map.begin(); it != map.end(); ++it) {
+        auto &itemPtr = it->second;
+        itemPtr.reset();
+    }
 }
 
 template<DerivedFromPhysicalItem T>
-int Container<T>::size() const {
-	return map.size();
+int Container<T>::size() const
+{
+    return map.size();
 }
 
 template<DerivedFromPhysicalItem T>
-void Container<T>::addItem(std::shared_ptr<T> newItem) {
-	map.insert(std::make_pair(newItem->getName(), newItem));
+void Container<T>::addItem(std::shared_ptr<T> newItem)
+{
+    map.insert(std::make_pair(newItem->getName(), newItem));
 }
 
 template<DerivedFromPhysicalItem T>
-void Container<T>::removeItem(const std::string& itemName) {
-	if (map.erase(itemName) == 0) {
-		throw ElementNotFound();
-	}
+void Container<T>::removeItem(const std::string &itemName)
+{
+    if (map.erase(itemName) == 0) {
+        throw ElementNotFound();
+    }
 }
 
 template<DerivedFromPhysicalItem T>
-bool Container<T>::find(const std::string& itemName) const {
-	return map.contains(itemName);
+bool Container<T>::find(const std::string &itemName) const
+{
+    return map.contains(itemName);
 }
 
 template<DerivedFromPhysicalItem T>
-std::shared_ptr<T> Container<T>::get(const std::string& itemName) const {
-	auto result = map.find(itemName);
-	if (result == map.end()) {
-		throw ElementNotFound();
-	}
-	return result->second;
+std::shared_ptr<T> Container<T>::get(const std::string &itemName) const
+{
+    auto result = map.find(itemName);
+    if (result == map.end()) {
+        throw ElementNotFound();
+    }
+    return result->second;
 }
 
 template<DerivedFromPhysicalItem T>
-std::vector<std::shared_ptr<T>> Container<T>::getElements() const {
-	std::vector<std::shared_ptr<T>> result;
-	for (auto it = map.begin(); it != map.end(); ++it) {
-		result.push_back(it->second);
-	}
-	return result;
+std::vector<std::shared_ptr<T>> Container<T>::getElements() const
+{
+    std::vector<std::shared_ptr<T>> result;
+    for (auto it = map.begin(); it != map.end(); ++it) {
+        result.push_back(it->second);
+    }
+    return result;
 }
 
 // Container with Max Capacity Methods
 
 template<ComparableAndPritable T>
-ContainerWithMaxCapacity<T>::ContainerWithMaxCapacity(int maxCapacity) : Container<T>(), maxCapacity(maxCapacity) {}
+ContainerWithMaxCapacity<T>::ContainerWithMaxCapacity(int maxCapacity)
+    : Container<T>(), maxCapacity(maxCapacity)
+{}
 
 template<ComparableAndPritable T>
 ContainerWithMaxCapacity<T>::~ContainerWithMaxCapacity() = default;
 
 template<ComparableAndPritable T>
-void ContainerWithMaxCapacity<T>::addItem(std::shared_ptr<T> newItem) {
+void ContainerWithMaxCapacity<T>::addItem(std::shared_ptr<T> newItem)
+{
 
-	// Additional check for available space
-	if (this->size() == maxCapacity) {
-		throw FullContainer();
-	}
-	this->Container<T>::addItem(newItem);
+    // Additional check for available space
+    if (this->size() == maxCapacity) {
+        throw FullContainer();
+    }
+    this->Container<T>::addItem(newItem);
 }
 
 template<ComparableAndPritable T>
-void ContainerWithMaxCapacity<T>::show() const {
+void ContainerWithMaxCapacity<T>::show() const
+{
 
-	// Vector of the elements
-	auto v = this->getElements();
+    // Vector of the elements
+    auto v = this->getElements();
 
-	// Instance of the game
-	auto game = Game::currentGame();
+    // Instance of the game
+    auto game = Game::currentGame();
 
-	// Sorting elements
-	std::sort(v.begin(), v.end(), [](const std::shared_ptr<T> first, const std::shared_ptr<T> second) {
-		return (*first < *second);
-		});
+    // Sorting elements
+    std::sort(v.begin(), v.end(), [](const std::shared_ptr<T> first, const std::shared_ptr<T> second)
+    {
+        return (*first < *second);
+    });
 
-	// Printing elements
-	for (auto& element : v) {
-		element->print(sysout);
-	}
-	sysout << std::endl;
+    // Printing elements
+    for (auto &element: v) {
+        element->print(sysout);
+    }
+    sysout << std::endl;
 }
 
 // Character Methods
 
-void Character::takeDamage(int damage) {
-	healthPoints -= damage;
+void Character::takeDamage(int damage)
+{
+    healthPoints -= damage;
 
-	// Check whether a character is alive
-	if (healthPoints <= 0) {
-		auto game = Game::currentGame();
+    // Check whether a character is alive
+    if (healthPoints <= 0) {
+        auto game = Game::currentGame();
 
-		// Remove dead character from the game
-		game->destroyCharacter(this->shared_from_this());
-	}
+        // Remove dead character from the game
+        game->destroyCharacter(this->shared_from_this());
+    }
 }
 
-void Character::heal(int healValue) {
-	healthPoints += healValue;
+void Character::heal(int healValue)
+{
+    healthPoints += healValue;
 }
 
-Character::Character(const std::string nameString, int healthValue) : name(nameString), healthPoints(healthValue) {}
+Character::Character(const std::string nameString, int healthValue)
+    : name(nameString), healthPoints(healthValue)
+{}
 
 Character::~Character() = default;
 
-std::string	Character::getName() const {
-	return name;
+std::string Character::getName() const
+{
+    return name;
 }
 
-int Character::getHp() const {
-	return healthPoints;
+int Character::getHp() const
+{
+    return healthPoints;
 }
 
-bool Character::operator > (const Character& other) const {
-	// Lexicographical comparison
-	return (name.compare(other.getName()) > 0);
+bool Character::operator>(const Character &other) const
+{
+    // Lexicographical comparison
+    return (name.compare(other.getName()) > 0);
 }
 
-bool Character::operator < (const Character& other) const {
-	// Lexicographical comparison
-	return (name.compare(other.getName()) < 0);
+bool Character::operator<(const Character &other) const
+{
+    // Lexicographical comparison
+    return (name.compare(other.getName()) < 0);
 }
 
 /// <summary>
@@ -559,127 +630,139 @@ bool Character::operator < (const Character& other) const {
 /// 
 /// The class enables creating shared pointers from an instance.
 /// </summary>
-class PhysicalItem : public std::enable_shared_from_this<PhysicalItem> {
+class PhysicalItem: public std::enable_shared_from_this<PhysicalItem>
+{
 private:
-	// States whether an item cannot be used more than once
-	bool isUsableOnce;
+    // States whether an item cannot be used more than once
+    bool isUsableOnce;
 
-	// Name of an item
-	std::string name;
+    // Name of an item
+    std::string name;
 protected:
 
-	// The owner of an item
-	std::shared_ptr<Character> owner;
+    // The owner of an item
+    std::shared_ptr<Character> owner;
 
-	/// <summary>
-	/// Getter for the owner.
-	/// </summary>
-	/// <returns> pointer to the character instance </returns>
-	std::shared_ptr<Character> getOwner() const {
-		return owner;
-	}
+    /// <summary>
+    /// Getter for the owner.
+    /// </summary>
+    /// <returns> pointer to the character instance </returns>
+    std::shared_ptr<Character> getOwner() const
+    {
+        return owner;
+    }
 
-	/// <summary>
-	/// Handles checks for the use of an item.
-	/// </summary>
-	/// <param name="user"> owner of the item </param>
-	/// <param name="target"> target to use item on </param>
-	void useCondition(const std::shared_ptr<const Character> user, std::shared_ptr<Character> target) {
+    /// <summary>
+    /// Handles checks for the use of an item.
+    /// </summary>
+    /// <param name="user"> owner of the item </param>
+    /// <param name="target"> target to use item on </param>
+    void useCondition(const std::shared_ptr<const Character> user, std::shared_ptr<Character> target)
+    {
 
-		// Owner check
-		if (user != owner) {
-			throw CharacterDoesNotOwnItem();
-		}
+        // Owner check
+        if (user != owner) {
+            throw CharacterDoesNotOwnItem();
+        }
 
-		// Applying item
-		useLogic(user, target);
+        // Applying item
+        useLogic(user, target);
 
-		// Destroying an item after use
-		if (isUsableOnce) {
-			afterUse();
-		}
-	}
+        // Destroying an item after use
+        if (isUsableOnce) {
+            afterUse();
+        }
+    }
 
-	/// <summary>
-	/// Abstract function to apply element of a user on a target.
-	/// </summary>
-	/// <param name="user">owner of the item</param>
-	/// <param name="target">target to use item on</param>
-	virtual void useLogic(const std::shared_ptr<const Character> user, std::shared_ptr<Character> target) const = 0;
+    /// <summary>
+    /// Abstract function to apply element of a user on a target.
+    /// </summary>
+    /// <param name="user">owner of the item</param>
+    /// <param name="target">target to use item on</param>
+    virtual void useLogic(const std::shared_ptr<const Character> user, std::shared_ptr<Character> target) const = 0;
 
-	/// <summary>
-	/// Deals with item destruction after use.
-	/// </summary>
-	void afterUse() {
-		owner->loseItem(this->shared_from_this());
-	}
+    /// <summary>
+    /// Deals with item destruction after use.
+    /// </summary>
+    void afterUse()
+    {
+        owner->loseItem(this->shared_from_this());
+    }
 
-	/// <summary>
-	/// Deals with giving damage to a given character.
-	/// </summary>
-	/// <param name="to"> reciever of damage </param>
-	/// <param name="damage"> damage value </param>
-	void giveDamageTo(const std::shared_ptr<Character> to, int damage) const {
-		to->takeDamage(damage);
-	}
+    /// <summary>
+    /// Deals with giving damage to a given character.
+    /// </summary>
+    /// <param name="to"> receiver of damage </param>
+    /// <param name="damage"> damage value </param>
+    void giveDamageTo(const std::shared_ptr<Character> to, int damage) const
+    {
+        to->takeDamage(damage);
+    }
 
-	/// <summary>
-	/// Deals with healing a given character.
-	/// </summary>
-	/// <param name="to"> reciever of heal</param>
-	/// <param name="heal"> heal value </param>
-	void giveHealTo(const std::shared_ptr<Character> to, int heal) const {
-		to->heal(heal);
-	}
+    /// <summary>
+    /// Deals with healing a given character.
+    /// </summary>
+    /// <param name="to"> receiver of heal</param>
+    /// <param name="heal"> heal value </param>
+    void giveHealTo(const std::shared_ptr<Character> to, int heal) const
+    {
+        to->heal(heal);
+    }
 public:
 
-	// Constructor
-	PhysicalItem(bool isUsableOnce, const std::shared_ptr<Character> owner, const std::string name) : isUsableOnce(isUsableOnce), name(name), owner(owner) {}
+    // Constructor
+    PhysicalItem(bool isUsableOnce, const std::shared_ptr<Character> owner, const std::string name)
+        : isUsableOnce(isUsableOnce), name(name), owner(owner)
+    {}
 
-	// Destructor
-	virtual ~PhysicalItem() = default;
+    // Destructor
+    virtual ~PhysicalItem() = default;
 
-	/// <summary>
-	/// Function that provides the use of an item.
-	/// </summary>
-	/// <param name="user"> owner of the item </param>
-	/// <param name="target"> target to use item on </param>
-	void use(const std::shared_ptr<const Character> user, std::shared_ptr<Character> target) {
-		useCondition(user, target);
-	}
+    /// <summary>
+    /// Function that provides the use of an item.
+    /// </summary>
+    /// <param name="user"> owner of the item </param>
+    /// <param name="target"> target to use item on </param>
+    void use(const std::shared_ptr<const Character> user, std::shared_ptr<Character> target)
+    {
+        useCondition(user, target);
+    }
 
-	/// <summary>
-	/// Getter for the name.
-	/// </summary>
-	/// <returns> name of the item </returns>
-	std::string getName() const {
-		return name;
-	}
+    /// <summary>
+    /// Getter for the name.
+    /// </summary>
+    /// <returns> name of the item </returns>
+    std::string getName() const
+    {
+        return name;
+    }
 
-	/// <summary>
-	/// Operator to compare two PhisicalItems.
-	/// </summary>
-	/// <param name="other">comparing item</param>
-	/// <returns> true if the compared item is bigger than the comparing item </returns>
-	bool operator > (const PhysicalItem& other) const {
-		return (name.compare(other.getName()) > 0);
-	}
+    /// <summary>
+    /// Operator to compare two PhysicalItems.
+    /// </summary>
+    /// <param name="other">comparing item</param>
+    /// <returns> true if the compared item is bigger than the comparing item </returns>
+    bool operator>(const PhysicalItem &other) const
+    {
+        return (name.compare(other.getName()) > 0);
+    }
 
-	/// <summary>
-	/// Operator to compare two PhisicalItems.
-	/// </summary>
-	/// <param name="other">comparing item</param>
-	/// <returns> true if the compared item is less than the comparing item </returns>
-	bool operator < (const PhysicalItem& other) const {
-		return (name.compare(other.getName()) < 0);
-	}
+    /// <summary>
+    /// Operator to compare two PhysicalItems.
+    /// </summary>
+    /// <param name="other">comparing item</param>
+    /// <returns> true if the compared item is less than the comparing item </returns>
+    bool operator<(const PhysicalItem &other) const
+    {
+        return (name.compare(other.getName()) < 0);
+    }
 
-	/// <summary>
-	/// Abstract function to print information about an item
-	/// to the output stream.
-	/// </summary>
-	/// <param name="out"> reference to the output stream</param>
-	virtual void print(std::ostream& out) const = 0;
+    /// <summary>
+    /// Abstract function to print information about an item
+    /// to the output stream.
+    /// </summary>
+    /// <param name="out"> reference to the output stream</param>
+    virtual void print(std::ostream &out) const = 0;
 };
 
 /// <summary>
@@ -687,50 +770,56 @@ public:
 /// represents an item that can give damage to
 /// characters.
 /// </summary>
-class Weapon : public PhysicalItem {
+class Weapon: public PhysicalItem
+{
 private:
-	int damage;
+    int damage;
 
-	/// <summary>
-	/// Implementation of the abstract function that
-	/// gives damage to target.
-	/// </summary>
-	/// <param name="user"> attacker</param>
-	/// <param name="target"> reciever of damage </param>
-	void useLogic(const std::shared_ptr<const Character> user, std::shared_ptr<Character> target) const override {
-		auto game = Game::currentGame();
-		sysout << user->getName() << " attacks " << target->getName() << " with their " << getName() << "!\n";
-		giveDamageTo(target, getDamage());
-	}
+    /// <summary>
+    /// Implementation of the abstract function that
+    /// gives damage to target.
+    /// </summary>
+    /// <param name="user"> attacker</param>
+    /// <param name="target"> receiver of damage </param>
+    void useLogic(const std::shared_ptr<const Character> user, std::shared_ptr<Character> target) const override
+    {
+        auto game = Game::currentGame();
+        sysout << user->getName() << " attacks " << target->getName() << " with their " << getName() << "!\n";
+        giveDamageTo(target, getDamage());
+    }
 public:
 
-	// Constructor
-	Weapon(const std::shared_ptr<Character> owner, const std::string name, int damage) : PhysicalItem(false, owner, name), damage(damage) {
+    // Constructor
+    Weapon(const std::shared_ptr<Character> owner, const std::string name, int damage)
+        : PhysicalItem(false, owner, name), damage(damage)
+    {
 
-		// Check for legal damage value
-		if (damage <= 0) {
-			throw IllegalDamageValue();
-		}
-	}
+        // Check for legal damage value
+        if (damage <= 0) {
+            throw IllegalDamageValue();
+        }
+    }
 
-	// Destructor
-	~Weapon() = default;
+    // Destructor
+    ~Weapon() = default;
 
-	/// <summary>
-	/// Getter for damage value.
-	/// </summary>
-	/// <returns> damage value </returns>
-	int getDamage() const {
-		return damage;
-	}
+    /// <summary>
+    /// Getter for damage value.
+    /// </summary>
+    /// <returns> damage value </returns>
+    int getDamage() const
+    {
+        return damage;
+    }
 
-	/// <summary>
-	/// Implementation of the print function.
-	/// </summary>
-	/// <param name="out"> reference to the output stream </param>
-	void print(std::ostream& out) const override {
-		out << getName() << ":" << getDamage() << " ";
-	}
+    /// <summary>
+    /// Implementation of the print function.
+    /// </summary>
+    /// <param name="out"> reference to the output stream </param>
+    void print(std::ostream &out) const override
+    {
+        out << getName() << ":" << getDamage() << " ";
+    }
 
 };
 
@@ -738,101 +827,115 @@ public:
 /// Class Potion inherits from PhysicalItem and
 /// represents an item that can heal characters.
 /// </summary>
-class Potion : public PhysicalItem {
+class Potion: public PhysicalItem
+{
 private:
-	int healValue;
+    int healValue;
 
-	/// <summary>
-	/// Implementation of the abstract function that
-	/// heals target.
-	/// </summary>
-	/// <param name="user">healer</param>
-	/// <param name="target">reciever of heal</param>
-	void useLogic(const std::shared_ptr<const Character> user, std::shared_ptr<Character> target) const override {
-		auto game = Game::currentGame();
-		sysout << target->getName() << " drinks " << getName() << " from " << user->getName() << ".\n";
-		giveHealTo(target, getHealValue());
-	}
+    /// <summary>
+    /// Implementation of the abstract function that
+    /// heals target.
+    /// </summary>
+    /// <param name="user">healer</param>
+    /// <param name="target">receiver of heal</param>
+    void useLogic(const std::shared_ptr<const Character> user, std::shared_ptr<Character> target) const override
+    {
+        auto game = Game::currentGame();
+        sysout << target->getName() << " drinks " << getName() << " from " << user->getName() << ".\n";
+        giveHealTo(target, getHealValue());
+    }
 public:
 
-	// Constructor
-	Potion(const std::shared_ptr<Character> owner, const std::string name, int healValue) : PhysicalItem(true, owner, name), healValue(healValue) {
-		if (healValue <= 0) {
-			throw IllegalHealthValue();
-		}
-	}
+    // Constructor
+    Potion(const std::shared_ptr<Character> owner, const std::string name, int healValue)
+        : PhysicalItem(true, owner, name), healValue(healValue)
+    {
+        if (healValue <= 0) {
+            throw IllegalHealthValue();
+        }
+    }
 
-	// Destructor
-	~Potion() = default;
+    // Destructor
+    ~Potion() = default;
 
-	/// <summary>
-	/// Getter for health value.
-	/// </summary>
-	/// <returns> heal value </returns>
-	int getHealValue() const {
-		return healValue;
-	}
+    /// <summary>
+    /// Getter for health value.
+    /// </summary>
+    /// <returns> heal value </returns>
+    int getHealValue() const
+    {
+        return healValue;
+    }
 
-	/// <summary>
-	/// Implementation of the print function.
-	/// </summary>
-	/// <param name="out"> reference to the output stream </param>
-	void print(std::ostream& out) const override {
-		out << getName() << ":" << getHealValue() << " ";
-	}
+    /// <summary>
+    /// Implementation of the print function.
+    /// </summary>
+    /// <param name="out"> reference to the output stream </param>
+    void print(std::ostream &out) const override
+    {
+        out << getName() << ":" << getHealValue() << " ";
+    }
 };
 
 /// <summary>
 /// Class Spell inherits from PhysicalItem and
 /// represents an item that kill characters.
 /// </summary>
-class Spell : public PhysicalItem {
+class Spell: public PhysicalItem
+{
 private:
 
-	// List of instances that can a spell can be cast on
-	std::vector<std::shared_ptr<Character>> allowedTargets;
+    // List of instances that a spell can be cast on
+    std::vector<std::shared_ptr<Character>> allowedTargets;
 
-	/// <summary>
-	/// Implementation of the abstract function that
-	/// casts a spell on target.
-	/// </summary>
-	/// <param name="user"> caster </param>
-	/// <param name="target"> target to cast spell on</param>
-	void useLogic(const std::shared_ptr<const Character> user, std::shared_ptr<Character> target) const override {
-		for (auto& allowedTarget : allowedTargets) {
-			if (allowedTarget == target) {
-				auto game = Game::currentGame();
-				sysout << user->getName() << " casts " << getName() << " on " << target->getName() << "!\n";
-				giveDamageTo(target, target->getHp());
-				return;
-			}
-		}
+    /// <summary>
+    /// Implementation of the abstract function that
+    /// casts a spell on target.
+    /// </summary>
+    /// <param name="user"> caster </param>
+    /// <param name="target"> target to cast spell on</param>
+    void useLogic(const std::shared_ptr<const Character> user, std::shared_ptr<Character> target) const override
+    {
+        for (auto &allowedTarget: allowedTargets) {
+            if (allowedTarget == target) {
+                auto game = Game::currentGame();
+                sysout << user->getName() << " casts " << getName() << " on " << target->getName() << "!\n";
+                giveDamageTo(target, target->getHp());
+                return;
+            }
+        }
 
-		throw NotAllowedTarget();
-	}
+        throw NotAllowedTarget();
+    }
 public:
 
-	// Constructor
-	Spell(const std::shared_ptr<Character> owner, const std::string name, const std::vector<std::shared_ptr<Character>>& allowedTargets) : PhysicalItem(true, owner, name), allowedTargets(allowedTargets) {}
+    // Constructor
+    Spell(const std::shared_ptr<Character> owner,
+          const std::string name,
+          const std::vector<std::shared_ptr<Character>> &allowedTargets)
+        : PhysicalItem(true, owner, name), allowedTargets(allowedTargets)
+    {}
 
-	// Destructor
-	~Spell() = default;
+    // Destructor
+    ~Spell() = default;
 
-	/// <summary>
-	/// Getter for the number of allowed targets.
-	/// </summary>
-	/// <returns> number of allowed targets </returns>
-	int getNumAllowedTargets() const {
-		return allowedTargets.size();
-	}
+    /// <summary>
+    /// Getter for the number of allowed targets.
+    /// </summary>
+    /// <returns> number of allowed targets </returns>
+    int getNumAllowedTargets() const
+    {
+        return allowedTargets.size();
+    }
 
-	/// <summary>
-	/// Implementation of the print function.
-	/// </summary>
-	/// <param name="out"> reference to the output stream </param>
-	void print(std::ostream& out) const override {
-		out << getName() << ":" << getNumAllowedTargets() << " ";
-	}
+    /// <summary>
+    /// Implementation of the print function.
+    /// </summary>
+    /// <param name="out"> reference to the output stream </param>
+    void print(std::ostream &out) const override
+    {
+        out << getName() << ":" << getNumAllowedTargets() << " ";
+    }
 };
 
 // Bindings of the Containers
@@ -845,755 +948,833 @@ using SpellBook = ContainerWithMaxCapacity<Spell>;
 /// Class WeaponUser represents a character that is
 /// able to use weapons.
 /// </summary>
-class WeaponUser : virtual public Character {
+class WeaponUser: virtual public Character
+{
 protected:
 
-	// Arsenal of weapons
-	Arsenal arsenal;
+    // Arsenal of weapons
+    Arsenal arsenal;
 public:
 
-	// Constructor
-	WeaponUser(const std::string nameString, int healthValue, int capacity) : Character(nameString, healthValue), arsenal(capacity) {}
+    // Constructor
+    WeaponUser(const std::string nameString, int healthValue, int capacity)
+        : Character(nameString, healthValue), arsenal(capacity)
+    {}
 
-	// Destructor
-	~WeaponUser() = default;
+    // Destructor
+    ~WeaponUser() = default;
 
-	/// <summary>
-	/// The function implements attack on the given character.
-	/// </summary>
-	/// <param name="target">reciever of damage</param>
-	/// <param name="weaponName">name of the weapon</param>
-	void attack(std::shared_ptr<Character> target, const std::string& weaponName) {
-		try {
-			auto item = arsenal.get(weaponName);
-			item->use(this->shared_from_this(), target);
-		}
-		catch (const ElementNotFound&) {
-			throw CharacterDoesNotOwnItem();
-		}
-	}
+    /// <summary>
+    /// The function implements attack on the given character.
+    /// </summary>
+    /// <param name="target">receiver of damage</param>
+    /// <param name="weaponName">name of the weapon</param>
+    void attack(std::shared_ptr<Character> target, const std::string &weaponName)
+    {
+        try {
+            auto item = arsenal.get(weaponName);
+            item->use(this->shared_from_this(), target);
+        }
+        catch (const ElementNotFound &) {
+            throw CharacterDoesNotOwnItem();
+        }
+    }
 
-	/// <summary>
-	/// Displays all weapons in the arsenal.
-	/// </summary>
-	void showWeapons() const {
-		arsenal.show();
-	}
+    /// <summary>
+    /// Displays all weapons in the arsenal.
+    /// </summary>
+    void showWeapons() const
+    {
+        arsenal.show();
+    }
 };
 
 /// <summary>
 /// Class PotionUser represents a character that is
 /// able to use potions.
 /// </summary>
-class PotionUser : virtual public Character {
+class PotionUser: virtual public Character
+{
 protected:
 
-	// Container of potions
-	MedicalBag medicalBag;
+    // Container of potions
+    MedicalBag medicalBag;
 public:
 
-	// Constructor
-	PotionUser(const std::string nameString, int healthValue, int capacity) : Character(nameString, healthValue), medicalBag(capacity) {}
+    // Constructor
+    PotionUser(const std::string nameString, int healthValue, int capacity)
+        : Character(nameString, healthValue), medicalBag(capacity)
+    {}
 
-	// Destructor
-	~PotionUser() = default;
+    // Destructor
+    ~PotionUser() = default;
 
-	/// <summary>
-	/// The function implements drinking of a potion by a target.
-	/// </summary>
-	/// <param name="target">reciever of heal</param>
-	/// <param name="potionName">name of the potion</param>
-	void drink(std::shared_ptr<Character> target, const std::string& potionName) {
-		try {
-			auto item = medicalBag.get(potionName);
-			item->use(this->shared_from_this(), target);
-		}
-		catch (const ElementNotFound&) {
-			throw CharacterDoesNotOwnItem();
-		}
-	}
+    /// <summary>
+    /// The function implements drinking of a potion by a target.
+    /// </summary>
+    /// <param name="target">receiver of heal</param>
+    /// <param name="potionName">name of the potion</param>
+    void drink(std::shared_ptr<Character> target, const std::string &potionName)
+    {
+        try {
+            auto item = medicalBag.get(potionName);
+            item->use(this->shared_from_this(), target);
+        }
+        catch (const ElementNotFound &) {
+            throw CharacterDoesNotOwnItem();
+        }
+    }
 
-	/// <summary>
-	/// Displays all potions in the medicalBag.
-	/// </summary>
-	void showPotions() const {
-		medicalBag.show();
-	}
+    /// <summary>
+    /// Displays all potions in the medicalBag.
+    /// </summary>
+    void showPotions() const
+    {
+        medicalBag.show();
+    }
 };
 
 /// <summary>
 /// Class SpellUser represents a character that is
 /// able to cast spells.
 /// </summary>
-class SpellUser : virtual public Character {
+class SpellUser: virtual public Character
+{
 protected:
 
-	// Container of spells
-	SpellBook spellBook;
+    // Container of spells
+    SpellBook spellBook;
 public:
 
-	// Constructor
-	SpellUser(const std::string nameString, int healthValue, int capacity) : Character(nameString, healthValue), spellBook(capacity) {}
+    // Constructor
+    SpellUser(const std::string nameString, int healthValue, int capacity)
+        : Character(nameString, healthValue), spellBook(capacity)
+    {}
 
-	// Destructor
-	~SpellUser() = default;
+    // Destructor
+    ~SpellUser() = default;
 
-	/// <summary>
-	/// The function implements cast on a target.
-	/// </summary>
-	/// <param name="target"> target to cast spell on</param>
-	/// <param name="spellName"> name of the spell</param>
-	void cast(std::shared_ptr<Character> target, const std::string& spellName) {
-		try {
-			auto item = spellBook.get(spellName);
-			item->use(this->shared_from_this(), target);
-		}
-		catch (const ElementNotFound&) {
-			throw CharacterDoesNotOwnItem();
-		}
-	}
+    /// <summary>
+    /// The function implements cast on a target.
+    /// </summary>
+    /// <param name="target"> target to cast spell on</param>
+    /// <param name="spellName"> name of the spell</param>
+    void cast(std::shared_ptr<Character> target, const std::string &spellName)
+    {
+        try {
+            auto item = spellBook.get(spellName);
+            item->use(this->shared_from_this(), target);
+        }
+        catch (const ElementNotFound &) {
+            throw CharacterDoesNotOwnItem();
+        }
+    }
 
-	/// <summary>
-	/// Displays all spells from the spellBook.
-	/// </summary>
-	void showSpells() const {
-		spellBook.show();
-	}
+    /// <summary>
+    /// Displays all spells from the spellBook.
+    /// </summary>
+    void showSpells() const
+    {
+        spellBook.show();
+    }
 };
 
 /// <summary>
 /// Class Fighter represents a character that can
 /// use weapons and potions.
 /// </summary>
-class Fighter : public WeaponUser, public PotionUser {
+class Fighter: public WeaponUser, public PotionUser
+{
 protected:
 
-	/// <summary>
-	/// Implementation of the abstract function that inserts the item
-	/// into either the arsenal or the medicalBag.
-	/// </summary>
-	/// <param name="item"> pointer to the item </param>
-	void obtainItem(std::shared_ptr<PhysicalItem> item) override {
+    /// <summary>
+    /// Implementation of the abstract function that inserts the item
+    /// into either the arsenal or the medicalBag.
+    /// </summary>
+    /// <param name="item"> pointer to the item </param>
+    void obtainItem(std::shared_ptr<PhysicalItem> item) override
+    {
 
-		// Cast of item to Weapon
-		if (dynamic_cast<Weapon*>(item.get())) {
-			auto weapon = std::dynamic_pointer_cast<Weapon>(item);
-			arsenal.addItem(weapon);
-		}
-		// Cast of item to Potion
-		else if (dynamic_cast<Potion*>(item.get())) {
-			auto potion = std::dynamic_pointer_cast<Potion>(item);
-			medicalBag.addItem(potion);
-		}
-		// Element cannot be used by a fighter
-		else {
-			throw IllegalItemType();
-		}
-	}
+        // Cast of item to Weapon
+        if (dynamic_cast<Weapon *>(item.get())) {
+            auto weapon = std::dynamic_pointer_cast<Weapon>(item);
+            arsenal.addItem(weapon);
+        }
+            // Cast of item to Potion
+        else if (dynamic_cast<Potion *>(item.get())) {
+            auto potion = std::dynamic_pointer_cast<Potion>(item);
+            medicalBag.addItem(potion);
+        }
+            // Element cannot be used by a fighter
+        else {
+            throw IllegalItemType();
+        }
+    }
 
-	/// <summary>
-	/// Implementation of the abstract function that removes the item
-	/// from either the arsenal or the medicalBag.
-	/// </summary>
-	/// <param name="item"> pointer to the item</param>
-	void loseItem(std::shared_ptr<PhysicalItem> item) override {
+    /// <summary>
+    /// Implementation of the abstract function that removes the item
+    /// from either the arsenal or the medicalBag.
+    /// </summary>
+    /// <param name="item"> pointer to the item</param>
+    void loseItem(std::shared_ptr<PhysicalItem> item) override
+    {
 
-		// Find the item in the arsenal
-		if (arsenal.find(item->getName())) {
-			arsenal.removeItem(item->getName());
-		}
-		// Find the item in the medicalBag
-		else {
-			medicalBag.removeItem(item->getName());
-		}
+        // Find the item in the arsenal
+        if (arsenal.find(item->getName())) {
+            arsenal.removeItem(item->getName());
+        }
+            // Find the item in the medicalBag
+        else {
+            medicalBag.removeItem(item->getName());
+        }
 
-		// Release data
-		item.reset();
-	}
+        // Release data
+        item.reset();
+    }
 public:
 
-	// Constructor
-	Fighter(const std::string nameString, int healthValue) : Character(nameString, healthValue), WeaponUser(nameString, healthValue, maxAllowedWeapons), PotionUser(nameString, healthValue, maxAllowedPotions) {}
+    // Constructor
+    Fighter(const std::string nameString, int healthValue)
+        : Character(nameString, healthValue), WeaponUser(nameString, healthValue, maxAllowedWeapons),
+          PotionUser(nameString, healthValue, maxAllowedPotions)
+    {}
 
-	// Destructor
-	~Fighter() = default;
+    // Destructor
+    ~Fighter() = default;
 
-	/// <summary>
-	/// Implementation of the print function.
-	/// </summary>
-	/// <param name="out"> reference to the output stream </param>
-	void print(std::ostream& out) const override {
-		out << getName() << ":fighter:" << getHp() << " ";
-	}
+    /// <summary>
+    /// Implementation of the print function.
+    /// </summary>
+    /// <param name="out"> reference to the output stream </param>
+    void print(std::ostream &out) const override
+    {
+        out << getName() << ":fighter:" << getHp() << " ";
+    }
 
-	// Maximum allowed number of weapons
-	static int maxAllowedWeapons;
+    // Maximum allowed number of weapons
+    static int maxAllowedWeapons;
 
-	// Maximum allowed number of potions
-	static int maxAllowedPotions;
+    // Maximum allowed number of potions
+    static int maxAllowedPotions;
 };
 
 /// <summary>
 /// Class Archer represents a character that can
 /// use weapons, potions, and spells.
 /// </summary>
-class Archer : public WeaponUser, public PotionUser, public SpellUser {
+class Archer: public WeaponUser, public PotionUser, public SpellUser
+{
 protected:
 
-	/// <summary>
-	/// Implementation of the abstract function that inserts the item
-	/// into either the arsenal.the medicalBag, or the spellBook.
-	/// </summary>
-	/// <param name="item">pointer to the item </param>
-	void obtainItem(std::shared_ptr<PhysicalItem> item) override {
+    /// <summary>
+    /// Implementation of the abstract function that inserts the item
+    /// into either the arsenal, the medicalBag, or the spellBook.
+    /// </summary>
+    /// <param name="item">pointer to the item </param>
+    void obtainItem(std::shared_ptr<PhysicalItem> item) override
+    {
 
-		// Cast the item to the Weapon
-		if (dynamic_cast<Weapon*>(item.get())) {
-			auto weapon = std::dynamic_pointer_cast<Weapon>(item);
-			arsenal.addItem(weapon);
-		}
-		// Cast the item to the Potion
-		else if (dynamic_cast<Potion*>(item.get())) {
-			auto potion = std::dynamic_pointer_cast<Potion>(item);
-			medicalBag.addItem(potion);
-		}
-		// Cast the item to the Spell
-		else if (dynamic_cast<Spell*>(item.get())) {
-			auto spell = std::dynamic_pointer_cast<Spell>(item);
-			spellBook.addItem(spell);
-		}
-		else {
-			throw IllegalItemType();
-		}
-	}
+        // Cast the item to the Weapon
+        if (dynamic_cast<Weapon *>(item.get())) {
+            auto weapon = std::dynamic_pointer_cast<Weapon>(item);
+            arsenal.addItem(weapon);
+        }
+            // Cast the item to the Potion
+        else if (dynamic_cast<Potion *>(item.get())) {
+            auto potion = std::dynamic_pointer_cast<Potion>(item);
+            medicalBag.addItem(potion);
+        }
+            // Cast the item to the Spell
+        else if (dynamic_cast<Spell *>(item.get())) {
+            auto spell = std::dynamic_pointer_cast<Spell>(item);
+            spellBook.addItem(spell);
+        }
+        else {
+            throw IllegalItemType();
+        }
+    }
 
-	/// <summary>
-	/// Implementation of the abstract function that removes the item
-	/// from either the arsenal, the medicalBag, or the spellBook.
-	/// </summary>
-	/// <param name="item"> pointer to the item </param>
-	void loseItem(std::shared_ptr<PhysicalItem> item) override {
+    /// <summary>
+    /// Implementation of the abstract function that removes the item
+    /// from either the arsenal, the medicalBag, or the spellBook.
+    /// </summary>
+    /// <param name="item"> pointer to the item </param>
+    void loseItem(std::shared_ptr<PhysicalItem> item) override
+    {
 
-		// Find the item in the arsenal
-		if (arsenal.find(item->getName())) {
-			arsenal.removeItem(item->getName());
-		}
-		// Find the item in the medicalBag
-		else if (medicalBag.find(item->getName())) {
-			medicalBag.removeItem(item->getName());
-		}
-		// Find the item in the spellBook
-		else {
-			spellBook.removeItem(item->getName());
-		}
+        // Find the item in the arsenal
+        if (arsenal.find(item->getName())) {
+            arsenal.removeItem(item->getName());
+        }
+            // Find the item in the medicalBag
+        else if (medicalBag.find(item->getName())) {
+            medicalBag.removeItem(item->getName());
+        }
+            // Find the item in the spellBook
+        else {
+            spellBook.removeItem(item->getName());
+        }
 
-		item.reset();
-	}
+        item.reset();
+    }
 public:
 
-	// Constructor
-	Archer(const std::string nameString, int healthValue) : Character(nameString, healthValue), WeaponUser(nameString, healthValue, maxAllowedWeapons), PotionUser(nameString, healthValue, maxAllowedPotions), SpellUser(nameString, healthValue, maxAllowedSpells) {}
+    // Constructor
+    Archer(const std::string nameString, int healthValue)
+        : Character(nameString, healthValue), WeaponUser(nameString, healthValue, maxAllowedWeapons),
+          PotionUser(nameString, healthValue, maxAllowedPotions), SpellUser(nameString, healthValue, maxAllowedSpells)
+    {}
 
-	// Destructor
-	~Archer() = default;
+    // Destructor
+    ~Archer() = default;
 
-	/// <summary>
-	/// Implementation of the print function.
-	/// </summary>
-	/// <param name="out"> reference to the output stream </param>
-	void print(std::ostream& out) const override {
-		out << getName() << ":archer:" << getHp() << " ";
-	}
+    /// <summary>
+    /// Implementation of the print function.
+    /// </summary>
+    /// <param name="out"> reference to the output stream </param>
+    void print(std::ostream &out) const override
+    {
+        out << getName() << ":archer:" << getHp() << " ";
+    }
 
-	// Maximum allowed number of weapons
-	static int maxAllowedWeapons;
+    // Maximum allowed number of weapons
+    static int maxAllowedWeapons;
 
-	// Maximum allowed number of potions
-	static int maxAllowedPotions;
+    // Maximum allowed number of potions
+    static int maxAllowedPotions;
 
-	// Maximum allowed number of spells
-	static int maxAllowedSpells;
+    // Maximum allowed number of spells
+    static int maxAllowedSpells;
 };
 
 /// <summary>
 /// Class Wizard represents a character that can
 /// use potions and spells.
 /// </summary>
-class Wizard : public PotionUser, public SpellUser {
+class Wizard: public PotionUser, public SpellUser
+{
 protected:
 
-	/// <summary>
-	/// Implementation of the abstract function that inserts the item
-	/// into either the medicalBag or the spellBook.
-	/// </summary>
-	/// <param name="item"></param>
-	void obtainItem(std::shared_ptr<PhysicalItem> item) override {
-		// Cast to Potion
-		if (dynamic_cast<Potion*>(item.get())) {
-			auto potion = std::dynamic_pointer_cast<Potion>(item);
-			medicalBag.addItem(potion);
-		}
-		// Cast to Spell
-		else if (dynamic_cast<Spell*>(item.get())) {
-			auto spell = std::dynamic_pointer_cast<Spell>(item);
-			spellBook.addItem(spell);
-		}
-		// Wizard cannot use such item
-		else {
-			throw IllegalItemType();
-		}
-	}
+    /// <summary>
+    /// Implementation of the abstract function that inserts the item
+    /// into either the medicalBag or the spellBook.
+    /// </summary>
+    /// <param name="item"></param>
+    void obtainItem(std::shared_ptr<PhysicalItem> item) override
+    {
+        // Cast to Potion
+        if (dynamic_cast<Potion *>(item.get())) {
+            auto potion = std::dynamic_pointer_cast<Potion>(item);
+            medicalBag.addItem(potion);
+        }
+            // Cast to Spell
+        else if (dynamic_cast<Spell *>(item.get())) {
+            auto spell = std::dynamic_pointer_cast<Spell>(item);
+            spellBook.addItem(spell);
+        }
+            // Wizard cannot use such item
+        else {
+            throw IllegalItemType();
+        }
+    }
 
-	/// <summary>
-	/// Implementation of the abstract function that removes the item
-	/// from either the medicalBag or the spellBook.
-	/// </summary>
-	/// <param name="item"></param>
-	void loseItem(std::shared_ptr<PhysicalItem> item) override {
-		// Find the item in the medicalBag
-		if (medicalBag.find(item->getName())) {
-			medicalBag.removeItem(item->getName());
-		}
-		// Find the item in the spellBook
-		else {
-			spellBook.removeItem(item->getName());
-		}
+    /// <summary>
+    /// Implementation of the abstract function that removes the item
+    /// from either the medicalBag or the spellBook.
+    /// </summary>
+    /// <param name="item"></param>
+    void loseItem(std::shared_ptr<PhysicalItem> item) override
+    {
+        // Find the item in the medicalBag
+        if (medicalBag.find(item->getName())) {
+            medicalBag.removeItem(item->getName());
+        }
+            // Find the item in the spellBook
+        else {
+            spellBook.removeItem(item->getName());
+        }
 
-		// Release data
-		item.reset();
-	}
+        // Release data
+        item.reset();
+    }
 public:
 
-	// Constructor
-	Wizard(const std::string nameString, int healthValue) : Character(nameString, healthValue), PotionUser(nameString, healthValue, maxAllowedPotions), SpellUser(nameString, healthValue, maxAllowedSpells) {}
+    // Constructor
+    Wizard(const std::string nameString, int healthValue)
+        : Character(nameString, healthValue), PotionUser(nameString, healthValue, maxAllowedPotions),
+          SpellUser(nameString, healthValue, maxAllowedSpells)
+    {}
 
-	// Destructor
-	~Wizard() = default;
+    // Destructor
+    ~Wizard() = default;
 
-	/// <summary>
-	/// Implementation of the print function.
-	/// </summary>
-	/// <param name="out"> reference to the output stream </param>
-	void print(std::ostream& out) const override {
-		out << getName() << ":wizard:" << getHp() << " ";
-	}
+    /// <summary>
+    /// Implementation of the print function.
+    /// </summary>
+    /// <param name="out"> reference to the output stream </param>
+    void print(std::ostream &out) const override
+    {
+        out << getName() << ":wizard:" << getHp() << " ";
+    }
 
-	// Maximum allowed number of potions
-	static int maxAllowedPotions;
+    // Maximum allowed number of potions
+    static int maxAllowedPotions;
 
-	// Maximum allowed number of spells
-	static int maxAllowedSpells;
+    // Maximum allowed number of spells
+    static int maxAllowedSpells;
 };
 
 // Game Methods
 
-inline std::shared_ptr<Game> Game::game{ nullptr };
+inline std::shared_ptr<Game> Game::game{nullptr};
 
-std::shared_ptr<Character> Game::getCharacterByName(std::string name) const {
-	auto vec = characters.getElements();
-	for (auto& character : vec) {
-		if (character->getName() == name) {
-			return character;
-		}
-	}
+std::shared_ptr<Character> Game::getCharacterByName(std::string name) const
+{
+    auto vec = characters.getElements();
+    for (auto &character: vec) {
+        if (character->getName() == name) {
+            return character;
+        }
+    }
 
-	throw CharacterDoesNotExist();
+    throw CharacterDoesNotExist();
 }
 
-void Game::showCharacters() {
+void Game::showCharacters()
+{
 
-	// Get the vector of alive characters
-	auto vec = characters.getElements();
+    // Get the vector of alive characters
+    auto vec = characters.getElements();
 
-	// Sort characters by name
-	std::sort(vec.begin(), vec.end(), [](const std::shared_ptr<Character> first, const std::shared_ptr<Character> second) {
-		return (*first < *second);
-		});
+    // Sort characters by name
+    std::sort(vec.begin(),
+              vec.end(),
+              [](const std::shared_ptr<Character> first, const std::shared_ptr<Character> second)
+              {
+                  return (*first < *second);
+              });
 
-	// Ouput characters information
-	for (auto& character : vec) {
-		character->print(output);
-	}
+    // Output characters information
+    for (auto &character: vec) {
+        character->print(output);
+    }
 
-	output << std::endl;
+    output << std::endl;
 }
 
-Game::Game() {
-	// Input stream
-	input.open("input.txt");
+Game::Game()
+{
+    // Input stream
+    input.open("input.txt");
 
-	// Output stream
-	output.open("output.txt");
+    // Output stream
+    output.open("output.txt");
 }
 
-void Game::startNewGame() {
+void Game::startNewGame()
+{
 
-	// Processing Input
+    // Processing Input
 
-	int N; input >> N;
-	for (int i = 0; i < N; ++i) {
-		std::string first;
-		input >> first;
-		if (first == "Create") {
-			std::string second;
-			input >> second;
-			if (second == "character") {
-				std::string type, name;
-				int initHP;
-				std::shared_ptr<Character> newChararcter;
+    int N;
+    input >> N;
+    for (int i = 0; i < N; ++i) {
+        std::string first;
+        input >> first;
+        if (first == "Create") {
+            std::string second;
+            input >> second;
+            if (second == "character") {
+                std::string type, name;
+                int initHP;
+                std::shared_ptr<Character> newCharacter;
 
-				input >> type >> name >> initHP;
+                input >> type >> name >> initHP;
 
-				if (type == "fighter") {
-					newChararcter = std::make_shared<Fighter>(name, initHP);
-					output << "A new fighter came to town, " << name << ".\n";
-				}
-				else if (type == "archer") {
-					newChararcter = std::make_shared<Archer>(name, initHP);
-					output << "A new archer came to town, " << name << ".\n";
-				}
-				else if (type == "wizard") {
-					newChararcter = std::make_shared<Wizard>(name, initHP);
-					output << "A new wizard came to town, " << name << ".\n";
-				}
-				else {
-					throw std::runtime_error("Unexpected command");
-				}
+                if (type == "fighter") {
+                    newCharacter = std::make_shared<Fighter>(name, initHP);
+                    output << "A new fighter came to town, " << name << ".\n";
+                }
+                else if (type == "archer") {
+                    newCharacter = std::make_shared<Archer>(name, initHP);
+                    output << "A new archer came to town, " << name << ".\n";
+                }
+                else if (type == "wizard") {
+                    newCharacter = std::make_shared<Wizard>(name, initHP);
+                    output << "A new wizard came to town, " << name << ".\n";
+                }
+                else {
+                    throw std::runtime_error("Unexpected command");
+                }
 
-				characters.addItem(newChararcter);
-			}
-			else if (second == "item") {
-				std::string third;
-				input >> third;
-				if (third == "weapon") {
-					try {
-						std::string ownerName; input >> ownerName;
-						std::string weaponName; input >> weaponName;
-						int damageValue; input >> damageValue;
-						auto owner = getCharacterByName(ownerName);
+                characters.addItem(newChararcter);
+            }
+            else if (second == "item") {
+                std::string third;
+                input >> third;
+                if (third == "weapon") {
+                    try {
+                        std::string ownerName;
+                        input >> ownerName;
+                        std::string weaponName;
+                        input >> weaponName;
+                        int damageValue;
+                        input >> damageValue;
+                        auto owner = getCharacterByName(ownerName);
 
-						std::shared_ptr<Weapon> newWeapon = std::make_shared<Weapon>(owner, weaponName, damageValue);
-						owner->obtainItem(newWeapon);
-						output << ownerName << " just obtained a new weapon called " << weaponName << ".\n";
-					}
-					catch (const CharacterDoesNotExist&) {
-						output << "Error caught\n";
-						continue;
-					}
-					catch (const IllegalDamageValue&) {
-						output << "Error caught\n";
-						continue;
-					}
-					catch (const FullContainer&) {
-						output << "Error caught\n";
-						continue;
-					}
-					catch (const IllegalItemType&) {
-						output << "Error caught\n";
-						continue;
-					}
-				}
-				else if (third == "potion") {
-					try {
-						std::string ownerName; input >> ownerName;
-						std::string potionName; input >> potionName;
-						int healValue; input >> healValue;
-						auto owner = getCharacterByName(ownerName);
+                        std::shared_ptr<Weapon> newWeapon = std::make_shared<Weapon>(owner, weaponName, damageValue);
+                        owner->obtainItem(newWeapon);
+                        output << ownerName << " just obtained a new weapon called " << weaponName << ".\n";
+                    }
+                    catch (const CharacterDoesNotExist &) {
+                        output << "Error caught\n";
+                        continue;
+                    }
+                    catch (const IllegalDamageValue &) {
+                        output << "Error caught\n";
+                        continue;
+                    }
+                    catch (const FullContainer &) {
+                        output << "Error caught\n";
+                        continue;
+                    }
+                    catch (const IllegalItemType &) {
+                        output << "Error caught\n";
+                        continue;
+                    }
+                }
+                else if (third == "potion") {
+                    try {
+                        std::string ownerName;
+                        input >> ownerName;
+                        std::string potionName;
+                        input >> potionName;
+                        int healValue;
+                        input >> healValue;
+                        auto owner = getCharacterByName(ownerName);
 
-						std::shared_ptr<Potion> newPotion = std::make_shared<Potion>(owner, potionName, healValue);
-						owner->obtainItem(newPotion);
-						output << ownerName << " just obtained a new potion called " << potionName << ".\n";
-					}
-					catch (const CharacterDoesNotExist&) {
-						output << "Error caught\n";
-						continue;
-					}
-					catch (const IllegalHealthValue&) {
-						output << "Error caught\n";
-						continue;
-					}
-					catch (const FullContainer&) {
-						output << "Error caught\n";
-						continue;
-					}
-					catch (const IllegalItemType&) {
-						output << "Error caught\n";
-						continue;
-					}
-				}
-				else if (third == "spell") {
-					try {
-						std::string ownerName; input >> ownerName;
-						std::string spellName; input >> spellName;
-						int m; input >> m;
+                        std::shared_ptr<Potion> newPotion = std::make_shared<Potion>(owner, potionName, healValue);
+                        owner->obtainItem(newPotion);
+                        output << ownerName << " just obtained a new potion called " << potionName << ".\n";
+                    }
+                    catch (const CharacterDoesNotExist &) {
+                        output << "Error caught\n";
+                        continue;
+                    }
+                    catch (const IllegalHealthValue &) {
+                        output << "Error caught\n";
+                        continue;
+                    }
+                    catch (const FullContainer &) {
+                        output << "Error caught\n";
+                        continue;
+                    }
+                    catch (const IllegalItemType &) {
+                        output << "Error caught\n";
+                        continue;
+                    }
+                }
+                else if (third == "spell") {
+                    try {
+                        std::string ownerName;
+                        input >> ownerName;
+                        std::string spellName;
+                        input >> spellName;
+                        int m;
+                        input >> m;
 
-						std::vector<std::string> targetNames;
+                        std::vector<std::string> targetNames;
 
-						for (int j = 0; j < m; ++j) {
-							std::string targetName; input >> targetName;
-							targetNames.push_back(targetName);
-						}
+                        for (int j = 0; j < m; ++j) {
+                            std::string targetName;
+                            input >> targetName;
+                            targetNames.push_back(targetName);
+                        }
 
-						auto owner = getCharacterByName(ownerName);
+                        auto owner = getCharacterByName(ownerName);
 
-						std::vector<std::shared_ptr<Character>> allowedTargets;
+                        std::vector<std::shared_ptr<Character>> allowedTargets;
 
-						for (int j = 0; j < m; ++j) {
-							std::string targetName = targetNames[j];
-							auto target = getCharacterByName(targetName);
-							allowedTargets.push_back(target);
-						}
+                        for (int j = 0; j < m; ++j) {
+                            std::string targetName = targetNames[j];
+                            auto target = getCharacterByName(targetName);
+                            allowedTargets.push_back(target);
+                        }
 
-						std::shared_ptr<Spell> newSpell = std::make_shared<Spell>(owner, spellName, allowedTargets);
-						owner->obtainItem(newSpell);
-						output << ownerName << " just obtained a new spell called " << spellName << ".\n";
-					}
-					catch (const CharacterDoesNotExist&) {
-						output << "Error caught\n";
-						continue;
-					}
-					catch (const FullContainer&) {
-						output << "Error caught\n";
-						continue;
-					}
-					catch (const IllegalItemType&) {
-						output << "Error caught\n";
-						continue;
-					}
-				}
-				else {
-					throw std::runtime_error("Unexpected command");
-				}
-			}
-			else {
-				throw std::runtime_error("Unexpected command");
-			}
-		}
-		else if (first == "Attack") {
-			try {
-				std::string attackerName; input >> attackerName;
-				std::string targetName; input >> targetName;
-				std::string weaponName; input >> weaponName;
+                        std::shared_ptr<Spell> newSpell = std::make_shared<Spell>(owner, spellName, allowedTargets);
+                        owner->obtainItem(newSpell);
+                        output << ownerName << " just obtained a new spell called " << spellName << ".\n";
+                    }
+                    catch (const CharacterDoesNotExist &) {
+                        output << "Error caught\n";
+                        continue;
+                    }
+                    catch (const FullContainer &) {
+                        output << "Error caught\n";
+                        continue;
+                    }
+                    catch (const IllegalItemType &) {
+                        output << "Error caught\n";
+                        continue;
+                    }
+                }
+                else {
+                    throw std::runtime_error("Unexpected command");
+                }
+            }
+            else {
+                throw std::runtime_error("Unexpected command");
+            }
+        }
+        else if (first == "Attack") {
+            try {
+                std::string attackerName;
+                input >> attackerName;
+                std::string targetName;
+                input >> targetName;
+                std::string weaponName;
+                input >> weaponName;
 
-				auto attacker = getCharacterByName(attackerName);
-				auto target = getCharacterByName(targetName);
+                auto attacker = getCharacterByName(attackerName);
+                auto target = getCharacterByName(targetName);
 
-				// Check whether the character can use weapons
-				if (dynamic_cast<WeaponUser*>(attacker.get())) {
-					auto weaponUser = std::dynamic_pointer_cast<WeaponUser>(attacker);
-					weaponUser->attack(target, weaponName);
-				}
-				else {
-					throw IllegalItemType();
-				}
+                // Check whether the character can use weapons
+                if (dynamic_cast<WeaponUser *>(attacker.get())) {
+                    auto weaponUser = std::dynamic_pointer_cast<WeaponUser>(attacker);
+                    weaponUser->attack(target, weaponName);
+                }
+                else {
+                    throw IllegalItemType();
+                }
 
-			}
-			catch (const CharacterDoesNotExist&) {
-				output << "Error caught\n";
-				continue;
-			}
-			catch (const IllegalItemType&) {
-				output << "Error caught\n";
-				continue;
-			}
-			catch (const CharacterDoesNotOwnItem&) {
-				output << "Error caught\n";
-				continue;
-			}
-		}
-		else if (first == "Cast") {
-			try {
-				std::string casterName; input >> casterName;
-				std::string targetName; input >> targetName;
-				std::string spellName; input >> spellName;
+            }
+            catch (const CharacterDoesNotExist &) {
+                output << "Error caught\n";
+                continue;
+            }
+            catch (const IllegalItemType &) {
+                output << "Error caught\n";
+                continue;
+            }
+            catch (const CharacterDoesNotOwnItem &) {
+                output << "Error caught\n";
+                continue;
+            }
+        }
+        else if (first == "Cast") {
+            try {
+                std::string casterName;
+                input >> casterName;
+                std::string targetName;
+                input >> targetName;
+                std::string spellName;
+                input >> spellName;
 
-				auto caster = getCharacterByName(casterName);
-				auto target = getCharacterByName(targetName);
+                auto caster = getCharacterByName(casterName);
+                auto target = getCharacterByName(targetName);
 
-				// Check whether the character can use spells
-				if (dynamic_cast<SpellUser*>(caster.get())) {
-					auto spellUser = std::dynamic_pointer_cast<SpellUser>(caster);
-					spellUser->cast(target, spellName);
-				}
-				else {
-					throw IllegalItemType();
-				}
+                // Check whether the character can use spells
+                if (dynamic_cast<SpellUser *>(caster.get())) {
+                    auto spellUser = std::dynamic_pointer_cast<SpellUser>(caster);
+                    spellUser->cast(target, spellName);
+                }
+                else {
+                    throw IllegalItemType();
+                }
 
-			}
-			catch (const CharacterDoesNotExist&) {
-				output << "Error caught\n";
-				continue;
-			}
-			catch (const IllegalItemType&) {
-				output << "Error caught\n";
-				continue;
-			}
-			catch (const CharacterDoesNotOwnItem&) {
-				output << "Error caught\n";
-				continue;
-			}
-			catch (const NotAllowedTarget&) {
-				output << "Error caught\n";
-				continue;
-			}
-		}
-		else if (first == "Drink") {
-			try {
-				std::string supplierName; input >> supplierName;
-				std::string drinkerName; input >> drinkerName;
-				std::string potionName; input >> potionName;
+            }
+            catch (const CharacterDoesNotExist &) {
+                output << "Error caught\n";
+                continue;
+            }
+            catch (const IllegalItemType &) {
+                output << "Error caught\n";
+                continue;
+            }
+            catch (const CharacterDoesNotOwnItem &) {
+                output << "Error caught\n";
+                continue;
+            }
+            catch (const NotAllowedTarget &) {
+                output << "Error caught\n";
+                continue;
+            }
+        }
+        else if (first == "Drink") {
+            try {
+                std::string supplierName;
+                input >> supplierName;
+                std::string drinkerName;
+                input >> drinkerName;
+                std::string potionName;
+                input >> potionName;
 
-				auto supplier = getCharacterByName(supplierName);
-				auto drinker = getCharacterByName(drinkerName);
+                auto supplier = getCharacterByName(supplierName);
+                auto drinker = getCharacterByName(drinkerName);
 
-				auto potionUser = std::dynamic_pointer_cast<PotionUser>(supplier);
-				potionUser->drink(drinker, potionName);
-			}
-			catch (const CharacterDoesNotExist&) {
-				output << "Error caught\n";
-				continue;
-			}
-			catch (const CharacterDoesNotOwnItem&) {
-				output << "Error caught\n";
-				continue;
-			}
-		}
-		else if (first == "Dialogue") {
-			try {
-				std::string speaker; input >> speaker;
-				int m; input >> m;
-				std::string speech;
+                auto potionUser = std::dynamic_pointer_cast<PotionUser>(supplier);
+                potionUser->drink(drinker, potionName);
+            }
+            catch (const CharacterDoesNotExist &) {
+                output << "Error caught\n";
+                continue;
+            }
+            catch (const CharacterDoesNotOwnItem &) {
+                output << "Error caught\n";
+                continue;
+            }
+        }
+        else if (first == "Dialogue") {
+            try {
+                std::string speaker;
+                input >> speaker;
+                int m;
+                input >> m;
+                std::string speech;
 
-				for (int j = 0; j < m; ++j) {
-					std::string word; input >> word;
-					speech += word + " ";
-				}
+                for (int j = 0; j < m; ++j) {
+                    std::string word;
+                    input >> word;
+                    speech += word + " ";
+                }
 
-				if (speaker == "Narrator") {
-					output << speaker << ": ";
-				}
-				else {
-					getCharacterByName(speaker);
-					output << speaker << ": ";
-				}
+                if (speaker == "Narrator") {
+                    output << speaker << ": ";
+                }
+                else {
+                    getCharacterByName(speaker);
+                    output << speaker << ": ";
+                }
 
-				output << speech << std::endl;
-			}
-			catch (const CharacterDoesNotExist&) {
-				output << "Error caught\n";
-				continue;
-			}
-		}
-		else if (first == "Show") {
-			std::string second;
-			input >> second;
-			if (second == "characters") {
-				showCharacters();
-			}
-			else if (second == "weapons") {
-				try {
-					std::string characterName; input >> characterName;
-					auto owner = getCharacterByName(characterName);
+                output << speech << std::endl;
+            }
+            catch (const CharacterDoesNotExist &) {
+                output << "Error caught\n";
+                continue;
+            }
+        }
+        else if (first == "Show") {
+            std::string second;
+            input >> second;
+            if (second == "characters") {
+                showCharacters();
+            }
+            else if (second == "weapons") {
+                try {
+                    std::string characterName;
+                    input >> characterName;
+                    auto owner = getCharacterByName(characterName);
 
-					// Check whether the character can use weapons
-					if (dynamic_cast<WeaponUser*>(owner.get())) {
-						auto weaponUser = std::dynamic_pointer_cast<WeaponUser>(owner);
-						weaponUser->showWeapons();
-					}
-					else {
-						throw IllegalItemType();
-					}
-				}
-				catch (const CharacterDoesNotExist&) {
-					output << "Error caught\n";
-					continue;
-				}
-				catch (const IllegalItemType&) {
-					output << "Error caught\n";
-					continue;
-				}
-			}
-			else if (second == "potions") {
-				try {
-					std::string characterName; input >> characterName;
-					auto owner = getCharacterByName(characterName);
+                    // Check whether the character can use weapons
+                    if (dynamic_cast<WeaponUser *>(owner.get())) {
+                        auto weaponUser = std::dynamic_pointer_cast<WeaponUser>(owner);
+                        weaponUser->showWeapons();
+                    }
+                    else {
+                        throw IllegalItemType();
+                    }
+                }
+                catch (const CharacterDoesNotExist &) {
+                    output << "Error caught\n";
+                    continue;
+                }
+                catch (const IllegalItemType &) {
+                    output << "Error caught\n";
+                    continue;
+                }
+            }
+            else if (second == "potions") {
+                try {
+                    std::string characterName;
+                    input >> characterName;
+                    auto owner = getCharacterByName(characterName);
 
-					auto potionUser = std::dynamic_pointer_cast<PotionUser>(owner);
-					potionUser->showPotions();
-				}
-				catch (const CharacterDoesNotExist&) {
-					output << "Error caught\n";
-					continue;
-				}
-			}
-			else if (second == "spells") {
-				try {
-					std::string characterName; input >> characterName;
-					auto owner = getCharacterByName(characterName);
+                    auto potionUser = std::dynamic_pointer_cast<PotionUser>(owner);
+                    potionUser->showPotions();
+                }
+                catch (const CharacterDoesNotExist &) {
+                    output << "Error caught\n";
+                    continue;
+                }
+            }
+            else if (second == "spells") {
+                try {
+                    std::string characterName;
+                    input >> characterName;
+                    auto owner = getCharacterByName(characterName);
 
-					// Check whether the character can use spells
-					if (dynamic_cast<SpellUser*>(owner.get())) {
-						auto spellUser = std::dynamic_pointer_cast<SpellUser>(owner);
-						spellUser->showSpells();
-					}
-					else {
-						throw IllegalItemType();
-					}
-				}
-				catch (const CharacterDoesNotExist&) {
-					output << "Error caught\n";
-					continue;
-				}
-				catch (const IllegalItemType&) {
-					output << "Error caught\n";
-					continue;
-				}
-			}
-			else {
-				throw std::runtime_error("Unexpected command");
-			}
-		}
-	}
+                    // Check whether the character can use spells
+                    if (dynamic_cast<SpellUser *>(owner.get())) {
+                        auto spellUser = std::dynamic_pointer_cast<SpellUser>(owner);
+                        spellUser->showSpells();
+                    }
+                    else {
+                        throw IllegalItemType();
+                    }
+                }
+                catch (const CharacterDoesNotExist &) {
+                    output << "Error caught\n";
+                    continue;
+                }
+                catch (const IllegalItemType &) {
+                    output << "Error caught\n";
+                    continue;
+                }
+            }
+            else {
+                throw std::runtime_error("Unexpected command");
+            }
+        }
+    }
 
-	// Closing files
+    // Closing files
 
-	input.close();
-	output.close();
+    input.close();
+    output.close();
 }
 
-std::shared_ptr<Game> Game::currentGame() {
-	if (game == nullptr) {
-		game.reset(new Game());
-	}
-	return game;
+std::shared_ptr<Game> Game::currentGame()
+{
+    if (game == nullptr) {
+        // Single instance is created, smart pointer is used
+        game.reset(new Game());
+    }
+    return game;
 }
 
-void Game::destroyCharacter(std::shared_ptr<Character> ptr) {
-	characters.removeItem(ptr);
-	output << ptr->getName() << " has died...\n";
-	ptr.reset();
+void Game::destroyCharacter(std::shared_ptr<Character> ptr)
+{
+    characters.removeItem(ptr);
+    output << ptr->getName() << " has died...\n";
+    ptr.reset();
 }
 
-std::ofstream& Game::getOutput() {
-	return output;
+std::ofstream &Game::getOutput()
+{
+    return output;
 }
 
 // Setting the static variables
 
-inline int Fighter::maxAllowedWeapons{ 3 };
-inline int Fighter::maxAllowedPotions{ 5 };
+inline int Fighter::maxAllowedWeapons{3};
 
-inline int Archer::maxAllowedWeapons{ 2 };
-inline int Archer::maxAllowedPotions{ 3 };
-inline int Archer::maxAllowedSpells{ 2 };
+inline int Fighter::maxAllowedPotions{5};
 
-inline int Wizard::maxAllowedPotions{ 10 };
-inline int Wizard::maxAllowedSpells{ 10 };
+inline int Archer::maxAllowedWeapons{2};
 
-int main() {
+inline int Archer::maxAllowedPotions{3};
 
-	// Start of game session
-	auto game = Game::currentGame();
-	game->startNewGame();
-	return 0;
+inline int Archer::maxAllowedSpells{2};
+
+inline int Wizard::maxAllowedPotions{10};
+
+inline int Wizard::maxAllowedSpells{10};
+
+int main()
+{
+
+    // Start of game session
+    auto game = Game::currentGame();
+    game->startNewGame();
+    return 0;
 }
